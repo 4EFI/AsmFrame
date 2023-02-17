@@ -72,7 +72,10 @@ PrintChar		proc
 
 PrintHrzLine	proc
 
-				push bx 		; push BP
+				cmp ch, 0
+				je __EndFunc
+
+				push bx 		
 
 				xor dx, dx		; i = 0
 
@@ -87,6 +90,8 @@ PrintHrzLine	proc
 					jne __Next
 
 				pop bx
+
+	__EndFunc:
 
 				ret
 				endp
@@ -106,7 +111,10 @@ PrintHrzLine	proc
 
 PrintVrtLine	proc
 
-				push bx 		; push BP
+				cmp cl, 0
+				je __EndFunc
+
+				push bx 
 
 				xor dx, dx		; i = 0
 
@@ -121,6 +129,8 @@ PrintVrtLine	proc
 					jne __Next
 
 				pop bx
+
+	__EndFunc:
 
 				ret
 				endp
