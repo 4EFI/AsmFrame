@@ -22,9 +22,10 @@ Start:		mov bx, 0b800h 		; ES = VideoSeg
 			mov cl, 10d		; HEIGHT
 			call PrintBox
 
-			; mov byte ptr al, 'v' 
-			; mov bx, 1920
-			; call PrintBin
+			mov bh, 1d		; X
+			mov bl, 5d		; Y 
+			mov ax, 2556d	; NUM
+			call PrintBin
 
 			EXIT	
 

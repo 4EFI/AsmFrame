@@ -36,11 +36,15 @@ __Next:			mov es:[bx], ax
 
 GetVideoPos		proc	
 
+				shl bh, 1		; bh /= 2
+				
 				mov al, 160d	; ax = 160 * Y + 2 * X
 				mul bl
 				mov dx, 0
 				add dl, bh
 				add ax, dx
+				
+				shr bh, 1		; bh *= 2
 
 				ret	
 				endp
@@ -59,17 +63,13 @@ GetVideoPos		proc
 
 PrintChar		proc	
 
-				shl bh, 1		; bh /= 2
-
-				push ax			; push sym
+				push ax			; push (1)
 				
 				call GetVideoPos
 
 				mov di, ax		; print( ax )
-				pop ax
+				pop ax			; pop  (1)
 				stosw			
-
-				shr bh, 1		; bh *= 2
 
 				ret
 				endp	
