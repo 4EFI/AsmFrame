@@ -25,7 +25,28 @@ __Next:			mov es:[bx], ax
 				endp
 
 ;------------------------------------------------
-;	PRINT SYM IN (X, Y)
+;	GET VIDEO POS FROM (X; Y)
+;------------------------------------------------
+; ENTRY:	BH = X LEFT CORNER COORDS [0; 79]
+;			BL = Y LEFT CORNER COORDS [0; 24]
+; EXIT:		AX = POS
+; EXPECTS:	ES = 0b800h (VIDEO SEGMENT)
+; DESTROYS:	AX DX
+;------------------------------------------------
+
+GetVideoPos		proc	
+
+				mov al, 160d	; ax = 160 * Y + 2 * X
+				mul bl
+				mov dx, 0
+				add dl, bh
+				add ax, dx
+
+				ret	
+				endp
+
+;------------------------------------------------
+;	PRINT SYM IN (X; Y)
 ;------------------------------------------------
 ; ENTRY:	AH = SYM COLOR
 ;			AL = SYM CHAR
@@ -33,7 +54,7 @@ __Next:			mov es:[bx], ax
 ;			BL = Y LEFT CORNER COORDS [0; 24]
 ; EXIT:		NONE
 ; EXPECTS:	ES = 0b800h (VIDEO SEGMENT)
-; DESTROYS:	DX DI BP
+; DESTROYS:	DX DI
 ;------------------------------------------------
 
 PrintChar		proc	
@@ -42,11 +63,7 @@ PrintChar		proc
 
 				push ax			; push sym
 				
-				mov al, 160d	; ax = 160 * Y + 2 * X
-				mul bl
-				mov dx, 0
-				add dl, bh
-				add ax, dx
+				call GetVideoPos
 
 				mov di, ax		; print( ax )
 				pop ax
@@ -58,7 +75,7 @@ PrintChar		proc
 				endp	
 
 ;------------------------------------------------
-;	PRINT HORIZONTAL LINE IN (X, Y)
+;	PRINT HORIZONTAL LINE IN (X; Y)
 ;------------------------------------------------
 ; ENTRY:	AH = SYM COLOR
 ;			AL = SYM CHAR
@@ -73,7 +90,7 @@ PrintChar		proc
 PrintHrzLine	proc
 
 				cmp ch, 0
-				je __EndFunc
+				jbe __EndFunc
 
 				push bx 		
 
@@ -97,7 +114,7 @@ PrintHrzLine	proc
 				endp
 
 ;------------------------------------------------
-;	PRINT VERTICAL LINE IN (X, Y)
+;	PRINT VERTICAL LINE IN (X; Y)
 ;------------------------------------------------
 ; ENTRY:	AH = SYM COLOR
 ;			AL = SYM CHAR
@@ -112,7 +129,7 @@ PrintHrzLine	proc
 PrintVrtLine	proc
 
 				cmp cl, 0
-				je __EndFunc
+				jbe __EndFunc
 
 				push bx 
 
@@ -147,19 +164,21 @@ PrintVrtLine	proc
 ; DESTROYS:	AX DX DI
 ;------------------------------------------------
 
-lt_ch 	db		0dah	; left  top  char
-ld_ch	db		0c0h	; left  down char
-rt_ch	db 		0bfh	; right top  char
-rd_ch	db 		0d9h	; rigth down char
+box_clr db		01fh	; yellow on red
 
-v_ch	db 		0b3h	; vertical 	 char
-h_ch  	db 		0c4h	; horizontal char
+lt_ch 	db		0c9h	; left  top  char
+ld_ch	db		0c8h	; left  down char
+rt_ch	db 		0bbh	; right top  char
+rd_ch	db 		0bch	; rigth down char
+
+v_ch	db 		0bah	; vertical 	 char
+h_ch  	db 		0cdh	; horizontal char
 
 PrintBox		proc
 
 				push bx				; print left top char
 				mov al, lt_ch		
-				mov ah, 70h
+				mov ah, box_clr
 				call PrintChar
 				pop bx			
 
@@ -167,7 +186,7 @@ PrintBox		proc
 				add bl, cl			
 				sub bl, 1
 				mov al, ld_ch
-				mov ah, 70h
+				mov ah, box_clr
 				call PrintChar
 				pop bx
 							
@@ -175,7 +194,7 @@ PrintBox		proc
 				add bh, ch					
 				sub bh, 1
 				mov al, rt_ch
-				mov ah, 70h
+				mov ah, box_clr
 				call PrintChar
 				pop bx
 
@@ -185,14 +204,14 @@ PrintBox		proc
 				add bl, cl
 				sub bl, 1
 				mov al, rd_ch
-				mov ah, 70h
+				mov ah, box_clr
 				call PrintChar
 				pop bx
 
 				push bx				; print top horizontal line	
 				add bh, 1					
 				mov al, h_ch
-				mov ah, 70h
+				mov ah, box_clr
 				sub ch, 2
 				call PrintHrzLine
 				add ch, 2
@@ -203,7 +222,7 @@ PrintBox		proc
 				add bl, cl
 				sub bl, 1
 				mov al, h_ch
-				mov ah, 70h
+				mov ah, box_clr
 				sub ch, 2
 				call PrintHrzLine
 				add ch, 2
@@ -212,7 +231,7 @@ PrintBox		proc
 				push bx				; print left vertical line	
 				add bl, 1					
 				mov al, v_ch
-				mov ah, 70h
+				mov ah, box_clr
 				sub cl, 2
 				call PrintVrtLine
 				add cl, 2
@@ -223,7 +242,7 @@ PrintBox		proc
 				add bh, ch
 				sub bh, 1
 				mov al, v_ch
-				mov ah, 70h
+				mov ah, box_clr
 				sub cl, 2
 				call PrintVrtLine
 				add cl, 2

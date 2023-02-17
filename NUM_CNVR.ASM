@@ -3,21 +3,23 @@
 ;	AX TO BIN
 ;------------------------------------------------
 ; ENTRY:	AX = NUM
-;			BX = POS
+;			BH = X LEFT CORNER COORDS [0; 79]
+;			BL = Y LEFT CORNER COORDS [0; 24]
 ; EXIT:		NONE
 ; EXPECTS:	ES = 0b800h (VIDEO SEGMENT)
-; DESTROYS:	BX CX DX DI  
+; DESTROYS:	CX DX DI  
 ;------------------------------------------------
 
 PrintBin		proc
 				
-				mov dx, ax				; DX = AX
-				mov cx, ax	
+				push ax
 
-				mov di, 16d * 2d 	 	; i = 16 * 2
-				add di, bx				; di += bx
-
+				call GetVideoPos 		; AX = Video position from (X; Y)
+				mov di, 16d * 2d 	 	; i = 16 * 2 + AX
+				add di, ax
 				std 
+
+				pop  ax
 
 __Next:			; shr ax, 1				; AX /= 2
 

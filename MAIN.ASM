@@ -17,9 +17,9 @@ Start:		mov bx, 0b800h 		; ES = VideoSeg
 			call ClrScrn
 
 			mov bh, 0d		; X
-			mov bl, 0d		; Y
-			mov ch, 2d		; WIDTH
-			mov cl, 2d		; HEIGHT
+			mov bl, 4d		; Y
+			mov ch, 50d		; WIDTH
+			mov cl, 10d		; HEIGHT
 			call PrintBox
 
 			; mov byte ptr al, 'v' 
