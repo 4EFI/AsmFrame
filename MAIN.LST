@@ -1,83 +1,190 @@
-Turbo Assembler	 Version 4.1	    02/17/23 18:45:02	    Page 1
+Turbo Assembler	 Version 4.1	    02/17/23 21:27:42	    Page 1
 main.asm
 
 
 
-      1				     .186
-      2	0000			     .model tiny
-      3	0000			     .code
-      4				     org 100h
-      5
-      6				     locals __
-      7
-      8				     include	     TOOLS.ASM			     ; Exit
-1     9
-1    10				     ;------------------------------------------------
-1    11				     ;	     EXIT PROGRAM
-1    12				     ;------------------------------------------------
-1    13				     ; Entry:	     NONE
-1    14				     ; EXIT:	     NONE
-1    15				     ; DESTROYS: AX
-1    16				     ;------------------------------------------------
-1    17
-1    18				     EXIT	     macro
-1    19							     nop
-1    20							     mov ax, 4c00h
-1    21							     int 21h
-1    22							     nop
-1    23							     endm
-1    24
-1    25				     ;------------------------------------------------
-     26
-     27	0100  BB B800		     Start:	     mov bx, 0b800h	     ; ES = VideoSeg
-     28	0103  8E C3					     mov es, bx
+      1
+      2				     .186
+      3	0000			     .model tiny
+      4	0000			     .code
+      5				     org 100h
+      6
+      7				     locals __
+      8
+      9				     include	     TOOLS.ASM			     ; Exit
+1    10
+1    11				     ;------------------------------------------------
+1    12				     ;	     EXIT PROGRAM
+1    13				     ;------------------------------------------------
+1    14				     ; Entry:	     NONE
+1    15				     ; EXIT:	     NONE
+1    16				     ; DESTROYS: AX
+1    17				     ;------------------------------------------------
+1    18
+1    19				     EXIT	     macro
+1    20							     nop
+1    21							     mov ax, 4c00h
+1    22							     int 21h
+1    23							     nop
+1    24							     endm
+1    25
+1    26				     ;------------------------------------------------
+     27
+     28				     ;------------------------------------------------
      29
-     30	0105  B8 0020					     mov byte ptr ax, '	'
-     31	0108  E8 0007					     call ClearScreen
+     30	0100  BB B800		     Start:	     mov bx, 0b800h	     ; ES = VideoSeg
+     31	0103  8E C3					     mov es, bx
      32
-     33							     EXIT
-1    34	010B  90					     nop
-1    35	010C  B8 4C00					     mov ax, 4c00h
-1    36	010F  CD 21					     int 21h
-1    37	0111  90					     nop
-     38
-     39				     include	     SCR_HNDL.ASM	     ; Clear Screen function
-1    40
-1    41				     ; SCREEN HANDLER
-1    42
-1    43				     ;------------------------------------------------
-1    44				     ;	     CLEAR SCREEN BY SYM
-1    45				     ;------------------------------------------------
-1    46				     ; ENTRY:	     AH	= COLOR	ATTR
-1    47				     ;			     Al	= SYM
-1    48				     ; EXIT:	     NONE
-1    49				     ; EXPECTS:	     ES	= 0b800h (VIDEO	SEGMENT)
-1    50				     ; DESTROYS:     BX	CX
-1    51				     ;------------------------------------------------
-1    52
-1    53	0112			     ClearScreen	     proc
-1    54
-1    55	0112  BB 0000						     mov bx, 0			     ; bx = 0
-1    56	0115  B9 07D0						     mov cx, 80d * 25d
-1    57
-Turbo Assembler	 Version 4.1	    02/17/23 18:45:02	    Page 2
+     33	0105  B8 0020					     mov byte ptr ax, '	'
+     34	0108  E8 000E					     call ClrScrn
+     35
+     36	010B  B7 00					     mov bh, 0d
+     37	010D  B3 0A					     mov bl, 10d
+     38	010F  E8 001C					     call PrintBox
+     39
+     40							     ; mov byte	ptr al,	'v'
+     41							     ; mov bx, 1920
+     42							     ; call PrintBin
+     43
+     44							     EXIT
+1    45	0112  90					     nop
+1    46	0113  B8 4C00					     mov ax, 4c00h
+1    47	0116  CD 21					     int 21h
+1    48	0118  90					     nop
+     49
+     50				     ;------------------------------------------------
+     51
+     52				     include	     SCR_HNDL.ASM    ; Clear Screen function
+1    53
+1    54				     ; SCREEN HANDLER
+1    55
+1    56				     ;------------------------------------------------
+1    57				     ;	     CLEAR SCREEN BY SYM
+Turbo Assembler	 Version 4.1	    02/17/23 21:27:42	    Page 2
 main.asm
 
 
 
-1    58	0118  26: 89 07		     __Next:		     mov es:[bx], ax
-1    59	011B  83 C3 02						     add bx, 2
-1    60
-1    61	011E  E2 F8						     loop __Next
-1    62
-1    63	0120  C3						     ret
-1    64	0121							     endp
+1    58				     ;------------------------------------------------
+1    59				     ; ENTRY:	     AH	= COLOR	ATTR
+1    60				     ;			     Al	= SYM
+1    61				     ; EXIT:	     NONE
+1    62				     ; EXPECTS:	     ES	= 0b800h (VIDEO	SEGMENT)
+1    63				     ; DESTROYS:     BX	CX
+1    64				     ;------------------------------------------------
 1    65
-1    66				     ;------------------------------------------------
-     67				     ; include	     NUM_CONVERT.ASM	     ; To BIN/DEC/HEX
-     68
-     69				     end		     Start
-Turbo Assembler	 Version 4.1	    02/17/23 18:45:02	    Page 3
+1    66	0119			     ClrScrn		     proc
+1    67
+1    68	0119  BB 0000						     mov bx, 0			     ; bx = 0
+1    69	011C  B9 07D0						     mov cx, 80d * 25d
+1    70
+1    71	011F  26: 89 07		     __Next:		     mov es:[bx], ax
+1    72	0122  83 C3 02						     add bx, 2
+1    73
+1    74	0125  E2 F8						     loop __Next
+1    75
+1    76	0127  C3						     ret
+1    77	0128							     endp
+1    78
+1    79				     ;------------------------------------------------
+1    80				     ;	     CLEAR SCREEN BY SYM
+1    81				     ;------------------------------------------------
+1    82				     ; ENTRY:	     BH	= X LEFT CORNER	COORDS [0; 79]
+1    83				     ;			     BL	= Y LEFT CORNER	COORDS [0; 24]
+1    84				     ;			     CH	= WIDTH
+1    85				     ;			     CL	= HEIGHT
+1    86				     ; EXIT:	     NONE
+1    87				     ; EXPECTS:	     ES	= 0b800h (VIDEO	SEGMENT)
+1    88				     ; DESTROYS:     BX	CX
+1    89				     ;------------------------------------------------
+1    90
+1    91	0128  DA		     lt_ch   db		     0dah    ; left  top  char
+1    92	0129  C0		     ld_ch   db		     0c0h    ; left  down char
+1    93	012A  BF		     rt_ch   db		     0bfh    ; right top  char
+1    94	012B  D9		     rd_ch   db		     0d9h    ; rigth down char
+1    95
+1    96	012C  C4		     v_ch    db		     0c4h    ; vertical	      char
+1    97	012D  B3		     h_ch    db		     0b3h    ; horizontal char
+1    98
+1    99	012E			     PrintBox		     proc
+1   100
+1   101	012E  BF 0000						     mov di, 0		     ; di  = 0
+1   102	0131  FD						     std
+1   103
+1   104	0132  B0 A0						     mov al, 160d    ; ax = 160	* Y + 2	* X
+1   105	0134  F6 E3						     mul bl
+1   106	0136  D0 E7						     shl bh, 1
+1   107	0138  BA 0000						     mov dx, 0
+1   108	013B  02 D7						     add dl, bh
+1   109	013D  03 C2						     add ax, dx
+1   110
+1   111	013F  03 F8						     add di, ax		     ; di += ax
+1   112
+1   113	0141  A0 0128r						     mov al, lt_ch
+1   114	0144  B4 70						     mov ah, 70h
+Turbo Assembler	 Version 4.1	    02/17/23 21:27:42	    Page 3
+main.asm
+
+
+
+1   115
+1   116	0146  AB						     stosw
+1   117
+1   118	0147			     __Next:
+1   119
+1   120
+1   121								     ; loop __Next
+1   122
+1   123	0147  C3						     ret
+1   124	0148							     endp
+1   125
+1   126				     ;------------------------------------------------
+    127				     include	     NUM_CNVR.ASM    ; Print AX	in BIN/DEC/HEX
+1   128
+1   129				     ;------------------------------------------------
+1   130				     ;	     AX	TO BIN
+1   131				     ;------------------------------------------------
+1   132				     ; ENTRY:	     AX	= NUM
+1   133				     ;			     BX	= POS
+1   134				     ; EXIT:	     NONE
+1   135				     ; EXPECTS:	     ES	= 0b800h (VIDEO	SEGMENT)
+1   136				     ; DESTROYS:     BX	CX DX DI
+1   137				     ;------------------------------------------------
+1   138
+1   139	0148			     PrintBin		     proc
+1   140
+1   141	0148  8B D0						     mov dx, ax				     ; DX = AX
+1   142	014A  8B C8						     mov cx, ax
+1   143
+1   144	014C  BF 0020						     mov di, 16d * 2d		     ; i = 16 *	2
+1   145	014F  03 FB						     add di, bx				     ; di += bx
+1   146
+1   147	0151  FD						     std
+1   148
+1   149	0152			     __Next:		     ; shr ax, 1			     ; AX /= 2
+1   150
+1   151	0152  B4 70						     mov byte ptr ah, 70h    ; black on	white
+1   152
+1   153	0154  83 EF 02						     sub di, 2				     ; print( ax ) // with 1+
+    154				     sym left( 2 bytes )
+1   155	0157  AB						     stosw
+1   156	0158  83 C7 02						     add di, 2
+1   157
+1   158								     ; mov al,
+1   159	015B  B4 00						     mov ah, 0
+1   160
+1   161	015D  3B FB						     cmp di, bx				     ; if( cx == bx )
+1   162	015F  75 F1						     jne __Next
+1   163
+1   164	0161  8B C2						     mov ax, dx				     ; AX = DX
+1   165
+1   166	0163  C3						     ret
+1   167	0164							     endp
+1   168
+1   169				     ;------------------------------------------------
+    170
+    171				     end		     Start
+Turbo Assembler	 Version 4.1	    02/17/23 21:27:42	    Page 4
 Symbol Table
 
 
@@ -87,7 +194,7 @@ Symbol Name			  Type	 Value
 
 ??DATE				  Text	 "02/17/23"
 ??FILENAME			  Text	 "main	  "
-??TIME				  Text	 "18:45:02"
+??TIME				  Text	 "21:27:42"
 ??VERSION			  Number 040A
 @32BIT				  Text	 0
 @CODE				  Text	 DGROUP
@@ -101,9 +208,19 @@ Symbol Name			  Type	 Value
 @MODEL				  Text	 1
 @STACK				  Text	 DGROUP
 @WORDSIZE			  Text	 2
-CLEARSCREEN			  Near	 DGROUP:0112
+CLRSCRN				  Near	 DGROUP:0119
+H_CH				  Byte	 DGROUP:012D
+LD_CH				  Byte	 DGROUP:0129
+LT_CH				  Byte	 DGROUP:0128
+PRINTBIN			  Near	 DGROUP:0148
+PRINTBOX			  Near	 DGROUP:012E
+RD_CH				  Byte	 DGROUP:012B
+RT_CH				  Byte	 DGROUP:012A
 START				  Near	 DGROUP:0100
-__NEXT				  Near	 DGROUP:0118
+V_CH				  Byte	 DGROUP:012C
+__NEXT				  Near	 DGROUP:011F
+__NEXT				  Near	 DGROUP:0147
+__NEXT				  Near	 DGROUP:0152
 
 Macro Name
 
@@ -113,5 +230,5 @@ Groups & Segments		  Bit Size Align  Combine Class
 
 DGROUP				  Group
   _DATA				  16  0000 Word	  Public  DATA
-  _TEXT				  16  0121 Word	  Public  CODE
+  _TEXT				  16  0164 Word	  Public  CODE
 
