@@ -136,3 +136,28 @@ PrintHex		proc
 				endp
 
 ;------------------------------------------------
+;	PRINT AX IN BIN/HEX/DEC
+;------------------------------------------------
+; ENTRY:	AX = NUM
+;			BH = X LEFT CORNER COORDS [0; 79]
+;			BL = Y LEFT CORNER COORDS [0; 24]
+; EXIT:		NONE
+; EXPECTS:	ES = 0b800h (VIDEO SEGMENT)
+; DESTROYS:	CX DX DI  
+;------------------------------------------------
+
+PrintNum		proc
+
+				push bx					; push (1)
+
+				call PrintBin
+
+				add bh, bin_len + 1d	; X 
+				call PrintHex
+
+				pop bx					; pop  (1)
+
+				ret
+				endp
+
+;------------------------------------------------

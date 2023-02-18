@@ -23,14 +23,9 @@ Start:		mov bx, 0b800h 		; ES = VideoSeg
 			call PrintBox
 
 			mov bh, 1d		; X
-			mov bl, 5d		; Y 
-			mov ax, 2556d	; NUM
-			call PrintBin
-
-			mov bh, 1d		; X
-			mov bl, 6d		; Y 
-			mov ax, 2556d	; NUM
-			call PrintHex
+			mov bl, 5d		; Y
+			mov ax, 255d	; NUM
+			call PrintNum
 
 			EXIT	
 
