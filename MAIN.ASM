@@ -24,7 +24,7 @@ Start:		mov bx, 0b800h 		; ES = VideoSeg
 
 			mov bh, 1d		; X
 			mov bl, 5d		; Y
-			mov ax, 255d	; NUM
+			mov ax, 101d	; NUM
 			call PrintNum
 
 			EXIT	

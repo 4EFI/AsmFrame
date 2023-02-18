@@ -1,6 +1,6 @@
 
 ;------------------------------------------------
-;	AX TO BIN
+;	PRINT AX IN BIN
 ;------------------------------------------------
 ; ENTRY:	AX = NUM
 ;			BH = X LEFT CORNER COORDS [0; 79]
@@ -47,7 +47,7 @@ PrintBin		proc
 
 								inc dx
 
-								cmp dx, bin_len			; if( di == bin_len )
+								cmp dx, bin_len			; if( dx == bin_len )
 								jne __Next
 
 				pop ax					; pop  (2)
@@ -56,7 +56,7 @@ PrintBin		proc
 				endp
 
 ;------------------------------------------------
-;	AX TO HEX
+;	PRINT AX IN HEX
 ;------------------------------------------------
 ; ENTRY:	AX = NUM
 ;			BH = X LEFT CORNER COORDS [0; 79]
@@ -127,12 +127,84 @@ PrintHex		proc
 
 								inc dx				; i++
 
-								cmp dx, hex_len		; if( di == hex_len )
+								cmp dx, hex_len		; if( dx == hex_len )
 								jne __Next
 
 				pop ax					; pop  (2)
 
 				ret
+				endp
+
+;------------------------------------------------
+;	PRINT AX IN DEC
+;------------------------------------------------
+; ENTRY:	AX = NUM
+;			BH = X LEFT CORNER COORDS [0; 79]
+;			BL = Y LEFT CORNER COORDS [0; 24]
+; EXIT:		NONE
+; EXPECTS:	ES = 0b800h (VIDEO SEGMENT)
+; DESTROYS:	CX DX DI  
+;------------------------------------------------
+
+dec_len	= 5d	
+
+PrintDec		proc
+
+				push ax					; push (1)
+
+				call GetVideoPos 		; AX = Video position from (X; Y)
+				mov di, dec_len * 2d 	; i = dec_len * 2 + AX
+				add di, ax
+				std 
+
+				pop  ax					; pop  (1)
+
+				xor dx, dx				; i = 0
+
+				push ax					; push (2)
+
+				mov cx, 10d				; CX = 10
+
+				__Next:			push dx				; push (3)
+
+								cmp ax, 10d		; if( ax > 10 )
+								jg	__Num
+
+								__Digit:		mov  dx, ax			; print( DL + '0' )
+												add  dx, 48d	
+
+												mov  ax, 0			; AX = 0
+												push ax				; push (4.1)
+
+												mov  al, dl			
+
+												jmp __End		
+
+
+								__Num:			div  cx				; AX /= 10
+
+												push ax				; push (4.2)	
+
+												add  dl, 48d		; print( DL + '0' )
+												mov  al, dl	
+
+				__End:			mov  ah, 70h		; black on white	
+
+								sub di, 2			; print( ax ) // with 1 sym left( 2 bytes )
+								stosw 					
+								add di, 2				
+
+								pop ax				; pop  (4)
+								pop dx				; pop  (3)
+
+								inc dx
+
+								cmp dx, dec_len		; if( dx == dec_len )
+								jne __Next
+
+				pop ax					; pop  (2)
+
+				ret 
 				endp
 
 ;------------------------------------------------
@@ -154,6 +226,9 @@ PrintNum		proc
 
 				add bh, bin_len + 1d	; X 
 				call PrintHex
+
+				add bh, hex_len + 1d	; X
+				call PrintDec
 
 				pop bx					; pop  (1)
 
