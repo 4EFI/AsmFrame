@@ -93,27 +93,23 @@ PrintChar		proc
 
 PrintHrzLine	proc
 
-				cmp ch, 0
-				jbe __EndFunc
+				cmp ch, 0		; if( ch <= 0 ) ret
+				jbe __End
 
 				push bx 		
 
 				xor dx, dx		; i = 0
 
-	__Next:			push dx
-					call PrintChar
-					pop  dx
+				__Next:			call PrintChar
 						
-					inc bh
-					inc dh
+								inc bh
+								inc dh
 
-					cmp dh, ch
-					jne __Next
-
+								cmp dh, ch
+								jne __Next
 				pop bx
 
-	__EndFunc:
-
+				__End:
 				ret
 				endp
 
@@ -132,27 +128,23 @@ PrintHrzLine	proc
 
 PrintVrtLine	proc
 
-				cmp cl, 0
-				jbe __EndFunc
+				cmp cl, 0		; if( cl <= 0 ) ret
+				jbe __End
 
 				push bx 
 
 				xor dx, dx		; i = 0
 
-	__Next:			push dx
-					call PrintChar
-					pop  dx
+				__Next:			call PrintChar
 						
-					inc bl
-					inc dl
+								inc bl
+								inc dl
 
-					cmp dl, cl
-					jne __Next
-
+								cmp dl, cl
+								jne __Next
 				pop bx
 
-	__EndFunc:
-
+				__End:
 				ret
 				endp
 
