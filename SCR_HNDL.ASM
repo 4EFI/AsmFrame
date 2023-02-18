@@ -31,19 +31,23 @@ __Next:			mov es:[bx], ax
 ;			BL = Y LEFT CORNER COORDS [0; 24]
 ; EXIT:		AX = POS
 ; EXPECTS:	ES = 0b800h (VIDEO SEGMENT)
-; DESTROYS:	AX DX
+; DESTROYS:	AX
 ;------------------------------------------------
 
 GetVideoPos		proc	
 
 				shl bh, 1		; bh /= 2
+
+				push dx			; push (1)
 				
 				mov al, 160d	; ax = 160 * Y + 2 * X
 				mul bl
 				mov dx, 0
 				add dl, bh
 				add ax, dx
-				
+
+				pop dx			; pop  (1)
+
 				shr bh, 1		; bh *= 2
 
 				ret	
@@ -58,7 +62,7 @@ GetVideoPos		proc
 ;			BL = Y LEFT CORNER COORDS [0; 24]
 ; EXIT:		NONE
 ; EXPECTS:	ES = 0b800h (VIDEO SEGMENT)
-; DESTROYS:	DX DI
+; DESTROYS:	DI
 ;------------------------------------------------
 
 PrintChar		proc	
