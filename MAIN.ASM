@@ -13,6 +13,17 @@ include 	TOOLS.ASM 			; Exit
 Start:		mov bx, 0b800h 		; ES = VideoSeg
 			mov es, bx
 
+			; call Input
+
+			mov bx, offset NameStr
+			call StrLen
+
+			mov bh, 1d		; X
+			mov bl, 5d		; Y
+			call PrintNum
+
+			call Input
+
 			mov byte ptr ax, ' '
 			call ClrScrn
 
@@ -24,14 +35,19 @@ Start:		mov bx, 0b800h 		; ES = VideoSeg
 
 			mov bh, 1d		; X
 			mov bl, 5d		; Y
-			mov ax, 101d	; NUM
+			mov ax, 1456d	; NUM
 			call PrintNum
 
 			EXIT	
 
 ;------------------------------------------------
 
-include 	SCR_HNDL.ASM 	; Clear Screen function
+NameStr db 	"Vlad", 0
+Msg  	db	100 dup (0) 
+
+include 	SCR_HNDL.ASM 	; Clear screen function
+include 	STR_HNDL.ASM 	; Str handler
+include 	MATH.ASM 		; Math functions
 include 	NUM_CNVR.ASM 	; Print AX in BIN/DEC/HEX	
 
 end			Start

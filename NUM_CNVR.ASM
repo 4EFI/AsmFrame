@@ -167,28 +167,16 @@ PrintDec		proc
 
 				__Next:			push dx				; push (3)
 
-								cmp ax, 10d		; if( ax > 10 )
-								jg	__Num
+								xor dx, dx			; DX = 0
 
-								__Digit:		mov  dx, ax			; print( DL + '0' )
-												add  dx, 48d	
+								div  cx				; AX /= 10
 
-												mov  ax, 0			; AX = 0
-												push ax				; push (4.1)
+								push ax				; push (4)	
 
-												mov  al, dl			
+								add  dl, 48d		; print( DL + '0' )
+								mov  al, dl	
 
-												jmp __End		
-
-
-								__Num:			div  cx				; AX /= 10
-
-												push ax				; push (4.2)	
-
-												add  dl, 48d		; print( DL + '0' )
-												mov  al, dl	
-
-				__End:			mov  ah, 70h		; black on white	
+								mov  ah, 70h		; black on white	
 
 								sub di, 2			; print( ax ) // with 1 sym left( 2 bytes )
 								stosw 					
@@ -199,7 +187,7 @@ PrintDec		proc
 
 								inc dx
 
-								cmp dx, dec_len		; if( dx == dec_len )
+								cmp dx, dec_len		; if( DX == dec_len )
 								jne __Next
 
 				pop ax					; pop  (2)
