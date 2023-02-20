@@ -13,10 +13,13 @@ include 	TOOLS.ASM 			; Exit
 Start:		mov bx, 0b800h 		; ES = VideoSeg
 			mov es, bx
 
-			; call Input
+			call Input
+			mov cx, dx
+			mov bx, offset InputStr
+			call Atoi
 
-			mov bx, offset NameStr
-			call StrLen
+			; mov bx, offset NameStr
+			; scall StrLen
 
 			mov bh, 1d		; X
 			mov bl, 5d		; Y
@@ -47,7 +50,6 @@ Msg  	db	100 dup (0)
 
 include 	SCR_HNDL.ASM 	; Clear screen function
 include 	STR_HNDL.ASM 	; Str handler
-include 	MATH.ASM 		; Math functions
 include 	NUM_CNVR.ASM 	; Print AX in BIN/DEC/HEX	
 
 end			Start

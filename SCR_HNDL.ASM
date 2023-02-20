@@ -253,7 +253,7 @@ PrintBox		proc
 ; ENTRY:	NONE
 ; EXIT:		DX = STR LEN
 ; EXPECTS:	ES = 0b800h (VIDEO SEGMENT)
-; DESTROYS:	AX DX
+; DESTROYS:	DX
 ;------------------------------------------------
 
 InputLen = 100
@@ -261,12 +261,14 @@ InputStr db 	InputLen dup (0)
 
 Input			proc 
 
+				push ax			; push (1)
+
 				xor dx, dx		; i++
 
 				__Next:			mov ah, 01h
 								int 21h
 
-								push si						; push (1)
+								push si						; push (2)
 
 								xor si, si					; SI = 0
 
@@ -275,7 +277,7 @@ Input			proc
 								
 								mov [si], al
 
-								pop si						; pop  (1)
+								pop si						; pop  (2)
 
 								cmp al, 13d					; if( al == '\r' )
 								je __End
@@ -284,7 +286,8 @@ Input			proc
 								cmp dx, InputLen			; if( i == InputLen )
 								jne __Next	
 
-				__End:									
+				__End:	
+				pop ax			; pop  (1)								
 				ret 
 				endp
 
