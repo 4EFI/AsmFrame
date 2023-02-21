@@ -13,7 +13,7 @@ include 	TOOLS.ASM 			; Exit
 Start:		mov bx, 0b800h 		; ES = VideoSeg
 			mov es, bx
 
-			mov bx, offset CmdLineData
+			mov bx, offset CmdData
 			call CmdLineHndl
 
 			mov byte ptr ax, ' '
@@ -25,7 +25,7 @@ Start:		mov bx, 0b800h 		; ES = VideoSeg
 			mov cl, 10d		; HEIGHT
 			call PrintBox
 
-			mov ax, [CmdLineData]
+			mov ax, [CmdData]
 
 			mov bh, 1d		; X
 			mov bl, 5d		; Y
@@ -34,6 +34,8 @@ Start:		mov bx, 0b800h 		; ES = VideoSeg
 			EXIT	
 
 ;------------------------------------------------
+
+CmdData	dw	20 dup (0)		; Cmd line data
 
 ;			X   Y   W    H    CLR
 arr db		0d, 4d, 50d, 10d, 07h

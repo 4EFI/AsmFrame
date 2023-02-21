@@ -7,8 +7,6 @@
 ; DESTROYS:	AX
 ;------------------------------------------------
 
-CmdLineData	    dw	    20 dup (0)		; Cmd line data
-
 CmdLineHndl     proc
 
                 xor ax, ax      ; AX = 0 ( num args counter = 0 ) 
