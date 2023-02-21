@@ -48,6 +48,7 @@ Atoi			proc
 
 				push dx			; push (1)
 
+				xor ax, ax		; AX = 0
 				xor dx, dx		; i = 0
 
 				__Next:			mov si, bx		; SI = BX + CX - i

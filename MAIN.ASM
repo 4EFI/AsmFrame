@@ -13,19 +13,8 @@ include 	TOOLS.ASM 			; Exit
 Start:		mov bx, 0b800h 		; ES = VideoSeg
 			mov es, bx
 
-			call Input
-			mov cx, dx
-			mov bx, offset InputStr
-			call Atoi
-
-			; mov bx, offset NameStr
-			; scall StrLen
-
-			mov bh, 1d		; X
-			mov bl, 5d		; Y
-			call PrintNum
-
-			call Input
+			mov bx, offset CmdLineData
+			call CmdLineHndl
 
 			mov byte ptr ax, ' '
 			call ClrScrn
@@ -36,19 +25,21 @@ Start:		mov bx, 0b800h 		; ES = VideoSeg
 			mov cl, 10d		; HEIGHT
 			call PrintBox
 
+			mov ax, [CmdLineData]
+
 			mov bh, 1d		; X
 			mov bl, 5d		; Y
-			mov ax, 1456d	; NUM
 			call PrintNum
 
 			EXIT	
 
 ;------------------------------------------------
 
-NameStr db 	"Vlad", 0
-Msg  	db	100 dup (0) 
+;			X   Y   W    H    CLR
+arr db		0d, 4d, 50d, 10d, 07h
 
 include 	SCR_HNDL.ASM 	; Clear screen function
+include 	CMD_HNDL.ASM 	; CMD line handler
 include 	STR_HNDL.ASM 	; Str handler
 include 	NUM_CNVR.ASM 	; Print AX in BIN/DEC/HEX	
 

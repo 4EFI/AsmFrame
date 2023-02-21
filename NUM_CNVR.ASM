@@ -143,7 +143,7 @@ PrintHex		proc
 ;			BL = Y LEFT CORNER COORDS [0; 24]
 ; EXIT:		NONE
 ; EXPECTS:	ES = 0b800h (VIDEO SEGMENT)
-; DESTROYS:	CX DX DI  
+; DESTROYS:	DI
 ;------------------------------------------------
 
 dec_len	= 5d	
@@ -159,19 +159,22 @@ PrintDec		proc
 
 				pop  ax					; pop  (1)
 
+				push cx					; push (2)
+				push dx					; push (3)
+
 				xor dx, dx				; i = 0
 
-				push ax					; push (2)
+				push ax					; push (4)
 
 				mov cx, 10d				; CX = 10
 
-				__Next:			push dx				; push (3)
+				__Next:			push dx				; push (5)
 
 								xor dx, dx			; DX = 0
 
 								div  cx				; AX /= 10
 
-								push ax				; push (4)	
+								push ax				; push (6)	
 
 								add  dl, 48d		; print( DL + '0' )
 								mov  al, dl	
@@ -182,15 +185,18 @@ PrintDec		proc
 								stosw 					
 								add di, 2				
 
-								pop ax				; pop  (4)
-								pop dx				; pop  (3)
+								pop ax				; pop  (6)
+								pop dx				; pop  (5)
 
 								inc dx
 
 								cmp dx, dec_len		; if( DX == dec_len )
 								jne __Next
+				
+				pop ax					; pop  (4)
 
-				pop ax					; pop  (2)
+				pop dx					; pop  (3)
+				pop cx					; pop  (2)
 
 				ret 
 				endp

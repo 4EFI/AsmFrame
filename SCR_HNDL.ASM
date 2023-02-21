@@ -151,10 +151,7 @@ PrintVrtLine	proc
 ;------------------------------------------------
 ;	PRINT BOX
 ;------------------------------------------------
-; ENTRY:	BH = X LEFT CORNER COORDS [0; 79]
-;			BL = Y LEFT CORNER COORDS [0; 24]
-;			CH = WIDTH
-;			CL = HEIGHT
+; ENTRY:	BX = DATA ADDR
 ; EXIT:		NONE
 ; EXPECTS:	ES = 0b800h (VIDEO SEGMENT)
 ; DESTROYS:	AX DX DI
@@ -162,35 +159,30 @@ PrintVrtLine	proc
 
 box_clr db		01fh	; yellow on red
 
-lt_ch 	db		0c9h	; left  top  char
-ld_ch	db		0c8h	; left  down char
-rt_ch	db 		0bbh	; right top  char
-rd_ch	db 		0bch	; rigth down char
-
-v_ch	db 		0bah	; vertical 	 char
-h_ch  	db 		0cdh	; horizontal char
+;				lt	  ld	rt	  rd	lv	  rv	th	  dh
+type_1 	db 		0c9h, 0c8h, 0bbh, 0bch, 0bah, 0bah, 0cdh, 0cdh
+type_2	db		0c9h, 0c8h, 0bbh, 0bch, 003h, 003h, 003h, 003h
 
 PrintBox		proc
 
-				push bx				; print left top char
-				mov al, lt_ch		
 				mov ah, box_clr
+
+				push bx				; print left top char
+				mov al, type_2[0]		
 				call PrintChar
 				pop bx			
 
 				push bx				; print left down char
 				add bl, cl			
 				sub bl, 1
-				mov al, ld_ch
-				mov ah, box_clr
+				mov al, type_2[1]
 				call PrintChar
 				pop bx
 							
 				push bx				; print right top char		
 				add bh, ch					
 				sub bh, 1
-				mov al, rt_ch
-				mov ah, box_clr
+				mov al, type_2[2]
 				call PrintChar
 				pop bx
 
@@ -199,35 +191,13 @@ PrintBox		proc
 				sub bh, 1
 				add bl, cl
 				sub bl, 1
-				mov al, rd_ch
-				mov ah, box_clr
+				mov al, type_2[3]
 				call PrintChar
-				pop bx
-
-				push bx				; print top horizontal line	
-				add bh, 1					
-				mov al, h_ch
-				mov ah, box_clr
-				sub ch, 2
-				call PrintHrzLine
-				add ch, 2
-				pop bx
-				
-				push bx 			; print down horizontal line	
-				add bh, 1					
-				add bl, cl
-				sub bl, 1
-				mov al, h_ch
-				mov ah, box_clr
-				sub ch, 2
-				call PrintHrzLine
-				add ch, 2
 				pop bx
 
 				push bx				; print left vertical line	
 				add bl, 1					
-				mov al, v_ch
-				mov ah, box_clr
+				mov al, type_2[4]
 				sub cl, 2
 				call PrintVrtLine
 				add cl, 2
@@ -237,11 +207,28 @@ PrintBox		proc
 				add bl, 1					
 				add bh, ch
 				sub bh, 1
-				mov al, v_ch
-				mov ah, box_clr
+				mov al, type_2[5]
 				sub cl, 2
 				call PrintVrtLine
 				add cl, 2
+				pop bx
+
+				push bx				; print top horizontal line	
+				add bh, 1					
+				mov al, type_2[6]
+				sub ch, 2
+				call PrintHrzLine
+				add ch, 2
+				pop bx
+				
+				push bx 			; print down horizontal line	
+				add bh, 1					
+				add bl, cl
+				sub bl, 1
+				mov al, type_2[7]
+				sub ch, 2
+				call PrintHrzLine
+				add ch, 2
 				pop bx
 
 				ret
@@ -251,9 +238,9 @@ PrintBox		proc
 ;	INPUT STR
 ;------------------------------------------------
 ; ENTRY:	NONE
-; EXIT:		DX = STR LEN
+; EXIT:		AX = STR LEN
 ; EXPECTS:	ES = 0b800h (VIDEO SEGMENT)
-; DESTROYS:	DX
+; DESTROYS:	AX
 ;------------------------------------------------
 
 InputLen = 100
@@ -261,11 +248,10 @@ InputStr db 	InputLen dup (0)
 
 Input			proc 
 
-				push ax			; push (1)
+				push dx			; push (1)
+				xor  dx, dx		; i = 0
 
-				xor dx, dx		; i++
-
-				__Next:			mov ah, 01h
+				__Next:			mov ah, 01h					; input char
 								int 21h
 
 								push si						; push (2)
@@ -287,7 +273,10 @@ Input			proc
 								jne __Next	
 
 				__End:	
-				pop ax			; pop  (1)								
+
+				mov ax, dx
+				pop dx			; pop  (1)
+			
 				ret 
 				endp
 
