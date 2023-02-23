@@ -251,23 +251,25 @@ PrintBox		proc
 				push dx				; push (3)
 				push di				; push (4)
 
-				mov ah, 07 ; bx[Clr_Num]
+				mov si, bx			; SI = DATA ADDR( BX )
 
-				mov byte ptr ch, 4 ; bx[W_Num]		; set WIDTH	
-				mov byte ptr cl, 4 ; bx[H_Num]		; set HEIGHT	
+				mov ah, bx[Clr_Num]
 
-				mov byte ptr al, type_1[6]		; set horizontal sym
-				mov byte ptr dh, type_1[0]		; set left  top  sym
-				mov byte ptr dl, type_1[2]		; set right top  sym
- 				mov byte ptr bh, 2 ; bx[X_Num]		; set X
-				mov byte ptr bl, 4 ; bx[Y_Num]		; set Y
+				mov byte ptr ch, bx[W_Num]		; set WIDTH	
+				mov byte ptr cl, bx[H_Num]		; set HEIGHT	
+						
+				mov  byte ptr al, type_1[6]		; set horizontal sym
+				mov  byte ptr dh, type_1[0]		; set left  top  sym
+				mov  byte ptr dl, type_1[2]		; set right top  sym
+ 				mov  byte ptr bh, si[X_Num]		; set X
+				mov  byte ptr bl, si[Y_Num]		; set Y
 				call PrintHrzLine				; Print top horizontal line
 
-				mov byte ptr al, type_1[4]		; set vertical  sym
-				mov byte ptr dh, type_1[0]		; set left top  sym
-				mov byte ptr dl, type_1[1]		; set left down sym
- 				; mov byte ptr bh, bx[X_Num]		; set X
-				; mov byte ptr bl, bx[Y_Num]		; set Y
+				mov  byte ptr al, type_1[4]		; set vertical  sym
+				mov  byte ptr dh, type_1[0]		; set left top  sym
+				mov  byte ptr dl, type_1[1]		; set left down sym
+ 				mov  byte ptr bh, si[X_Num]		; set X
+				mov  byte ptr bl, si[Y_Num]		; set Y
 				call PrintVrtLine				; Print top vertical line
 
 				pop di				; pop  (4)

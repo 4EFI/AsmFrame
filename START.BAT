@@ -1,2 +1,2 @@
 #        X      Y       W       H       CLR
-MAIN.COM 1      4       50      10      7
+MAIN.COM 0      4       50      10      31
