@@ -246,36 +246,60 @@ Clr_Num = 4
 
 PrintBox		proc
 
-				push ax 			; push (1)
-				push cx				; push (2)
-				push dx				; push (3)
-				push di				; push (4)
+				push ax 				; push (1)
+				push bx					; push (2)
+				push cx					; push (3)
+				push dx					; push (4)
+				push si					; push (5)
+				push di					; push (6)
 
-				mov si, bx			; SI = DATA ADDR( BX )
+				mov si, bx				; SI = DATA ADDR( BX )
 
-				mov ah, bx[Clr_Num]
+				mov ah, bx[Clr_Num]		; set Color
 
-				mov byte ptr ch, bx[W_Num]		; set WIDTH	
-				mov byte ptr cl, bx[H_Num]		; set HEIGHT	
+				mov ch, bx[W_Num]		; set WIDTH	
+				mov cl, bx[H_Num]		; set HEIGHT	
 						
-				mov  byte ptr al, type_1[6]		; set horizontal sym
-				mov  byte ptr dh, type_1[0]		; set left  top  sym
-				mov  byte ptr dl, type_1[2]		; set right top  sym
- 				mov  byte ptr bh, si[X_Num]		; set X
-				mov  byte ptr bl, si[Y_Num]		; set Y
-				call PrintHrzLine				; Print top horizontal line
+ 				mov  bh, si[X_Num]		; set X
+				mov  bl, si[Y_Num]		; set Y
+				mov  al, type_1[6]		; set horizontal sym
+				mov  dh, type_1[0]		; set left  top  sym
+				mov  dl, type_1[2]		; set right top  sym
+				call PrintHrzLine		; Print top horizontal line
 
-				mov  byte ptr al, type_1[4]		; set vertical  sym
-				mov  byte ptr dh, type_1[0]		; set left top  sym
-				mov  byte ptr dl, type_1[1]		; set left down sym
- 				mov  byte ptr bh, si[X_Num]		; set X
-				mov  byte ptr bl, si[Y_Num]		; set Y
-				call PrintVrtLine				; Print top vertical line
+ 				mov  bh, si[X_Num]		; set X
+				mov  bl, si[Y_Num]		; set Y
+				mov  al, type_1[4]		; set vertical  sym
+				mov  dh, type_1[0]		; set left top  sym
+				mov  dl, type_1[1]		; set left down sym
+				call PrintVrtLine		; Print left vertical line
 
-				pop di				; pop  (4)
-				pop dx				; pop  (3)
-				pop cx				; pop  (2)
-				pop ax				; pop  (1)
+ 				mov  bh, si[X_Num]		; set X
+				mov  dl, si[Y_Num]	    ; Y += ( HEIGHT - 1 )
+				add  dl, cl
+				sub  dl, 1
+				mov  bl, dl				; set Y
+				mov  al, type_1[7]		; set horizontal sym
+				mov  dh, type_1[1]		; set left  down sym
+				mov  dl, type_1[3]		; set right down sym
+				call PrintHrzLine		; Print down horizontal line
+
+				mov  dl, si[X_Num]	    ; X += ( WIDTH - 1 )
+				add  dl, ch
+				sub  dl, 1  
+				mov  bh, dl				; set X
+				mov  bl, si[Y_Num]		; set Y
+				mov  al, type_1[5]		; set vertical  sym
+				mov  dh, type_1[2]		; set right top  sym
+				mov  dl, type_1[3]		; set right down sym
+				call PrintVrtLine		; Print right vertical line
+
+				pop di					; pop  (6)
+				pop si					; pop  (5)
+				pop dx					; pop  (4)
+				pop cx					; pop  (3)
+				pop bx					; pop  (2)
+				pop ax					; pop  (1)
 
 				ret
 				endp
