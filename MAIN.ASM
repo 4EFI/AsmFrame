@@ -13,30 +13,26 @@ include 	TOOLS.ASM 			; Exit
 Start:		mov bx, 0b800h 		; ES = VideoSeg
 			mov es, bx
 
-			; mov bx, offset CmdData
-			;call CmdLineHndl
-
-			push ax
+			mov bx, offset CmdData
+			call CmdLineHndl
 
 			mov byte ptr ax, ' '
 			call ClrScrn	
 
 			mov byte ptr al, [CmdData + 1]
 
-			pop ax
-
-			;mov bh, 1d		; X
-			;mov bl, 5d		; Y
-			;call PrintNum
-
 			mov bx, offset CmdData
 			call PrintBox
+
+			mov bh, 1d		; X
+			mov bl, 5d		; Y
+			call PrintNum
 
 			EXIT	
 
 ;------------------------------------------------
 
-CmdData	db	20 dup (2)		; Cmd line data
+CmdData	db	20 dup (0)		; Cmd line data
 
 include 	SCR_HNDL.ASM 	; Clear screen function
 include 	CMD_HNDL.ASM 	; CMD line handler

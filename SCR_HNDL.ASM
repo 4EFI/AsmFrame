@@ -228,7 +228,7 @@ PrintVrtLine	proc
 ; ENTRY:	BX = DATA ADDR
 ; EXIT:		NONE
 ; EXPECTS:	ES = 0b800h (VIDEO SEGMENT)
-; DESTROYS:	AX DX DI
+; DESTROYS:	NONE
 ;------------------------------------------------
 
 TypeSize = 9
@@ -248,6 +248,8 @@ PrintBox		proc
 
 				push ax 			; push (1)
 				push cx				; push (2)
+				push dx				; push (3)
+				push di				; push (4)
 
 				mov ah, 07 ; bx[Clr_Num]
 
@@ -268,6 +270,8 @@ PrintBox		proc
 				; mov byte ptr bl, bx[Y_Num]		; set Y
 				call PrintVrtLine				; Print top vertical line
 
+				pop di				; pop  (4)
+				pop dx				; pop  (3)
 				pop cx				; pop  (2)
 				pop ax				; pop  (1)
 
@@ -279,7 +283,6 @@ PrintBox		proc
 ;------------------------------------------------
 ; ENTRY:	NONE
 ; EXIT:		AX = STR LEN
-; EXPECTS:	ES = 0b800h (VIDEO SEGMENT)
 ; DESTROYS:	AX
 ;------------------------------------------------
 

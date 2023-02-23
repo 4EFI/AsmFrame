@@ -5,7 +5,7 @@
 ; ENTRY:	BX = STR ADDR
 ; EXIT:		AX = LEN
 ; EXPECTS:  END SYM = '$' or '\0'
-; DESTROYS: NONE	
+; DESTROYS: AX	
 ;------------------------------------------------
 
 StrLen          proc
@@ -46,24 +46,26 @@ StrLen          proc
 
 Atoi			proc	
 
-				push dx			; push (1)
-
 				xor ax, ax		; AX = 0
+
+				push dx			; push (1)
+				push si			; push (2)
+
 				xor dx, dx		; i = 0
 
-				__Next:			mov si, bx		; SI = BX + CX - i
+				__Next:			mov si, bx		; SI = BX + STR_LEN - i
 								add si, cx
 								sub si, dx
 								sub si, 1
 
-								push cx			; push (2)
+								push cx			; push (3)
 
-								push ax			; push (3) 
+								push ax			; push (4) 
 								xor  ax, ax    	; AX = 0
 								mov  al, [si]	; AX = [SI] - '0'
 								sub  al, 48d
 
-								push dx			; push (4)
+								push dx			; push (5)
 								mov  cx, dx		; AX = AX * 10^DX 
 								mov  si, 10d
 								jcxz __NoMul
@@ -75,18 +77,19 @@ Atoi			proc
 												jne __Mul
 								
 								__NoMul:
-								pop  dx			; pop  (4)
-								mov  cx, ax
+								pop  dx			; pop  (5)
+								mov  cx, ax	 
 
-								pop ax			; pop  (3)
+								pop ax			; pop  (4)
 								add ax, cx
-								pop cx			; pop  (2)
+								pop cx			; pop  (3)
 
 								inc dx			; i++
 
 								cmp dx, cx		; if( i == CX )
 								jne __Next	
 
+				pop si			; pop  (2)
 				pop dx			; pop  (1)	
 
 				ret	
