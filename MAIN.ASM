@@ -16,17 +16,16 @@ Start:		mov bx, 0b800h 		; ES = VideoSeg
 			mov bx, offset CmdData
 			call CmdLineHndl
 
-			mov byte ptr ax, ' '
-			call ClrScrn
-
-			mov ax, 123d	; set NUM	
-
-			mov bh, 1d		; X
-			mov bl, 5d		; Y
-			call PrintNum
+			mov ax, ' '	
+			call ClrScreen			
 
 			mov bx, offset CmdData
 			call PrintBox
+
+			; mov ax, 123d			; set NUM
+			; mov bh, 1d			; X
+			; mov bl, 5d			; Y
+			; call PrintNum
 
 			EXIT	
 

@@ -1,6 +1,6 @@
 
 ;------------------------------------------------
-;	DIVIDE CMD LINE ARGS TO ARRAY ( BYTE PTR )
+;	DIVIDE CMD LINE ARGS ( FROM 82h ) TO ARRAY ( BYTE PTR )
 ;------------------------------------------------
 ; ENTRY:	BX = ARR ADDR ( ARGS )
 ; EXIT:		AX = NUM ARGS

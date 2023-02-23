@@ -2,24 +2,87 @@
 ; SCREEN HANDLER
 
 ;------------------------------------------------
-;	CLEAR SCREEN BY SYM
+;	FILL SCREEN BY SYM 
+;	FROM ( X; Y ) to ( X + WIDTH; Y + HEIGHT )
 ;------------------------------------------------
 ; ENTRY:	AH = COLOR ATTR
-;			Al = SYM
+;			AL = SYM
+;			BH = X LEFT CORNER COORDS [0; 79]
+;			BL = Y LEFT CORNER COORDS [0; 24]
+;			CH = WIDTH
+;			CL = HEIGHT
 ; EXIT:		NONE
 ; EXPECTS:	ES = 0b800h (VIDEO SEGMENT)
-; DESTROYS:	BX CX  
+; DESTROYS:	NONE  
 ;------------------------------------------------
 
-ClrScrn			proc
+FillScreen		proc
 			
-				mov bx, 0			; bx = 0
-				mov cx, 80d * 25d
+				push bx				; push (1)
+				push cx				; push (2)
+				push dx				; push (3)
 
-				__Next:			mov es:[bx], ax
-								add bx, 2
+				push ax				; push (4)
+				call GetVideoPos
+				mov bx, ax			
+				pop ax				; pop  (4)
 
-								loop __Next
+				__NextLine:			mov dh, ch		; i = CH	
+
+									push bx			; push (5)
+									
+									__Next:			mov es:[bx], ax
+													add bx, 2
+
+													dec dh			; i--
+
+													cmp dh, 0d		; if( dh == 0 )
+													je __End
+
+													jmp __Next		
+									__End:	
+
+									pop bx			; pop  (5)
+
+									add bx, 160d	; BX += 2*80
+
+									dec cl 			; CL--
+
+									cmp cl, 0d   	; if( CL == 0 )
+									je __EndNextLine
+
+									jmp __NextLine
+				__EndNextLine:
+
+				pop dx				; pop  (3)									
+				pop cx				; pop  (2)
+				pop bx				; pop  (1)
+
+				ret
+				endp
+
+;------------------------------------------------
+;	CLEAR SCREEN BY SYM 
+;------------------------------------------------
+; ENTRY:	AH = COLOR ATTR
+;			AL = SYM
+; EXIT:		NONE
+; EXPECTS:	ES = 0b800h (VIDEO SEGMENT)
+; DESTROYS:	NONE  
+;------------------------------------------------
+
+ClrScreen		proc
+
+				push bx				; push (1)
+				push cx				; push (2)
+
+				xor bx, bx			; X = 0; Y = 0
+				mov ch, 80d			
+				mov cl, 25d
+				call FillScreen
+
+				pop cx				; pop  (2)
+				pop bx				; pop  (1)
 
 				ret
 				endp
@@ -233,6 +296,10 @@ PrintVrtLine	proc
 
 TypeSize = 9
 
+; User's type
+Type_0	db		9 dup (0)
+
+; Template types
 ;				0		1 		2 		3		4		5		6		7		9
 ;				lt	  	ld		rt	  	rd		lv	 	rv		th	  	dh		fill
 Type_1 	db 		0c9h, 	0c8h, 	0bbh, 	0bch, 	0bah, 	0bah,	0cdh,	0cdh, 	0d
@@ -284,25 +351,38 @@ PrintBox		proc
 				mov  dl, bp[1]			; DL = left down sym
 				call PrintVrtLine		; Print left vertical line
 
- 				mov  bh, si[X_Num]		; set X
+ 				mov  bh, si[X_Num]		; BH = X
 				mov  dl, si[Y_Num]	    ; Y += ( HEIGHT - 1 )
 				add  dl, cl
 				sub  dl, 1
-				mov  bl, dl				; set Y
-				mov  al, bp[7]			; set horizontal sym
-				mov  dh, bp[1]			; set left  down sym
-				mov  dl, bp[3]			; set right down sym
+				mov  bl, dl				; BL = Y
+				mov  al, bp[7]			; AL = horizontal sym
+				mov  dh, bp[1]			; DH = left  down sym
+				mov  dl, bp[3]			; DL = right down sym
 				call PrintHrzLine		; Print down horizontal line
 
 				mov  dl, si[X_Num]	    ; X += ( WIDTH - 1 )
 				add  dl, ch
 				sub  dl, 1  
-				mov  bh, dl				; set X
-				mov  bl, si[Y_Num]		; set Y
-				mov  al, bp[5]			; set vertical  sym
-				mov  dh, bp[2]			; set right top  sym
-				mov  dl, bp[3]			; set right down sym
+				mov  bh, dl				; BH = X
+				mov  bl, si[Y_Num]		; BL = Y
+				mov  al, bp[5]			; AL = vertical   sym
+				mov  dh, bp[2]			; DH = right top  sym
+				mov  dl, bp[3]			; DL = right down sym
 				call PrintVrtLine		; Print right vertical line
+
+				push bx					; push (8)
+				push cx					; push (9)
+				mov  bh, si[X_Num]		; BH = X + 1
+				add  bh, 1
+				mov  bl, si[Y_Num]		; BL = Y + 1
+				add  bl, 1
+				mov  al, bp[8]			; AL = filling sym
+				sub  ch, 2				; WIDTH  -= 2
+				sub  cl, 2				; HEIGHT -= 2
+				call FillScreen			; Fill Box
+				pop cx					; pop  (9)
+				pop bx					; pop  (8)
 
 				pop bp					; pop  (7)
 				pop di					; pop  (6)
