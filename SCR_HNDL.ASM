@@ -233,16 +233,17 @@ PrintVrtLine	proc
 
 TypeSize = 9
 
-;				0		1 		2 		3		4		5		6		7
-;				lt	  	ld		rt	  	rd		lv	 	rv		th	  	dh
-type_1 	db 		0c9h, 	0c8h, 	0bbh, 	0bch, 	0bah, 	0bah,	0cdh,	0cdh
-type_2	db		0c9h, 	0c8h, 	0bbh, 	0bch, 	003h, 	003h, 	003h, 	003h
+;				0		1 		2 		3		4		5		6		7		9
+;				lt	  	ld		rt	  	rd		lv	 	rv		th	  	dh		fill
+Type_1 	db 		0c9h, 	0c8h, 	0bbh, 	0bch, 	0bah, 	0bah,	0cdh,	0cdh, 	0d
+Type_2	db		0c9h, 	0c8h, 	0bbh, 	0bch, 	003h, 	003h, 	003h, 	003h,  	0d
 
-X_Num   = 0
-Y_Num   = 1
-W_Num   = 2
-H_Num   = 3
-Clr_Num = 4				
+X_Num    = 0
+Y_Num    = 1
+W_Num    = 2
+H_Num    = 3
+Clr_Num  = 4	
+Type_Num = 5				
 
 PrintBox		proc
 
@@ -252,26 +253,35 @@ PrintBox		proc
 				push dx					; push (4)
 				push si					; push (5)
 				push di					; push (6)
+				push bp					; push (7)
 
 				mov si, bx				; SI = DATA ADDR( BX )
 
-				mov ah, bx[Clr_Num]		; set Color
+				xor ax, ax				; BP = Type_1 + ( Type - 1 ) * 9
+				mov al, bx[Type_Num]	
+				sub al, 1
+				mov cx, 9d				
+				mul cx 
+				mov bp, ax
+				add bp, offset Type_1
 
-				mov ch, bx[W_Num]		; set WIDTH	
-				mov cl, bx[H_Num]		; set HEIGHT	
+				mov ah, bx[Clr_Num]		; AH = Color
+
+				mov ch, bx[W_Num]		; CH = WIDTH	
+				mov cl, bx[H_Num]		; CL = HEIGHT	
 						
- 				mov  bh, si[X_Num]		; set X
-				mov  bl, si[Y_Num]		; set Y
-				mov  al, type_1[6]		; set horizontal sym
-				mov  dh, type_1[0]		; set left  top  sym
-				mov  dl, type_1[2]		; set right top  sym
+ 				mov  bh, si[X_Num]		; BH = X
+				mov  bl, si[Y_Num]		; BL = Y
+				mov  al, bp[6]			; AL = horizontal sym
+				mov  dh, bp[0]			; DH = left  top  sym
+				mov  dl, bp[2]			; DL = right top  sym
 				call PrintHrzLine		; Print top horizontal line
 
- 				mov  bh, si[X_Num]		; set X
-				mov  bl, si[Y_Num]		; set Y
-				mov  al, type_1[4]		; set vertical  sym
-				mov  dh, type_1[0]		; set left top  sym
-				mov  dl, type_1[1]		; set left down sym
+ 				mov  bh, si[X_Num]		; BH = X
+				mov  bl, si[Y_Num]		; BL = Y
+				mov  al, bp[4]			; AL = vertical  sym
+				mov  dh, bp[0]			; DH = left top  sym
+				mov  dl, bp[1]			; DL = left down sym
 				call PrintVrtLine		; Print left vertical line
 
  				mov  bh, si[X_Num]		; set X
@@ -279,9 +289,9 @@ PrintBox		proc
 				add  dl, cl
 				sub  dl, 1
 				mov  bl, dl				; set Y
-				mov  al, type_1[7]		; set horizontal sym
-				mov  dh, type_1[1]		; set left  down sym
-				mov  dl, type_1[3]		; set right down sym
+				mov  al, bp[7]			; set horizontal sym
+				mov  dh, bp[1]			; set left  down sym
+				mov  dl, bp[3]			; set right down sym
 				call PrintHrzLine		; Print down horizontal line
 
 				mov  dl, si[X_Num]	    ; X += ( WIDTH - 1 )
@@ -289,11 +299,12 @@ PrintBox		proc
 				sub  dl, 1  
 				mov  bh, dl				; set X
 				mov  bl, si[Y_Num]		; set Y
-				mov  al, type_1[5]		; set vertical  sym
-				mov  dh, type_1[2]		; set right top  sym
-				mov  dl, type_1[3]		; set right down sym
+				mov  al, bp[5]			; set vertical  sym
+				mov  dh, bp[2]			; set right top  sym
+				mov  dl, bp[3]			; set right down sym
 				call PrintVrtLine		; Print right vertical line
 
+				pop bp					; pop  (7)
 				pop di					; pop  (6)
 				pop si					; pop  (5)
 				pop dx					; pop  (4)
