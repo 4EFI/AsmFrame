@@ -158,19 +158,46 @@ PrintHrzLine	proc
 ;			BH = X LEFT CORNER COORDS [0; 79]
 ;			BL = Y LEFT CORNER COORDS [0; 24]
 ;			CL = HEIGHT
+;			DH = TOP  SYM
+;			DL = DOWN SYM
 ; EXIT:		NONE
 ; EXPECTS:	ES = 0b800h (VIDEO SEGMENT)
-; DESTROYS:	DX DI
+; DESTROYS:	DI
 ;------------------------------------------------
 
 PrintVrtLine	proc
 
-				cmp cl, 0		; if( cl <= 0 ) ret
+				cmp cl, 1			; if( cl <= 1 ) ret
 				jbe __End
 
-				push bx 
+				push bx				; push (1) 
+				push dx				; push (2)
 
-				xor dx, dx		; i = 0
+
+				push ax				; push (3)
+				mov al, dh			; printf( "%c", TopSym )
+				call PrintChar
+				pop ax				; pop  (3)
+
+				push ax				; push (4)
+				push bx				; push (5)
+				add bl, cl			; Y += ( HEIGHT - 1 )			
+				sub bl, 1
+				mov al, dl			; printf( "%c", DownSym )
+				call PrintChar
+				pop bx				; pop  (5)
+				pop ax				; pop  (4)
+
+				push bx				; push (6)
+				push cx				; push (7)
+
+				add bl, 1			; Y += 1		
+				sub cl, 2			; HEIGHT -= 2
+
+				cmp cl, 0			; if( cl == 0 )
+				je 	__EndPrinting	
+
+				xor dx, dx			; i = 0
 
 				__Next:			call PrintChar
 						
@@ -178,8 +205,18 @@ PrintVrtLine	proc
 								inc dl
 
 								cmp dl, cl
-								jne __Next
-				pop bx
+								je  __EndPrinting
+
+								jmp __Next
+
+				__EndPrinting:
+
+				pop cx				; pop  (7)
+				pop bx				; pop  (6)
+				
+
+				pop dx				; pop  (2)
+				pop bx				; pop  (1)			
 
 				__End:
 				ret
@@ -215,14 +252,21 @@ PrintBox		proc
 				mov ah, 07 ; bx[Clr_Num]
 
 				mov byte ptr ch, 4 ; bx[W_Num]		; set WIDTH	
-				mov byte ptr cl, bx[H_Num]		; set HEIGHT	
+				mov byte ptr cl, 4 ; bx[H_Num]		; set HEIGHT	
 
 				mov byte ptr al, type_1[6]		; set horizontal sym
 				mov byte ptr dh, type_1[0]		; set left  top  sym
 				mov byte ptr dl, type_1[2]		; set right top  sym
- 				mov byte ptr bh, bx[X_Num]		; set X
-				mov byte ptr bl, bx[Y_Num]		; set Y
+ 				mov byte ptr bh, 2 ; bx[X_Num]		; set X
+				mov byte ptr bl, 4 ; bx[Y_Num]		; set Y
 				call PrintHrzLine				; Print top horizontal line
+
+				mov byte ptr al, type_1[4]		; set vertical  sym
+				mov byte ptr dh, type_1[0]		; set left top  sym
+				mov byte ptr dl, type_1[1]		; set left down sym
+ 				; mov byte ptr bh, bx[X_Num]		; set X
+				; mov byte ptr bl, bx[Y_Num]		; set Y
+				call PrintVrtLine				; Print top vertical line
 
 				pop cx				; pop  (2)
 				pop ax				; pop  (1)
