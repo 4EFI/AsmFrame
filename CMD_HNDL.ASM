@@ -1,6 +1,6 @@
 
 ;------------------------------------------------
-;	DIVIDE CMD LINE ARGS TO ARRAY
+;	DIVIDE CMD LINE ARGS TO ARRAY ( BYTE PTR )
 ;------------------------------------------------
 ; ENTRY:	BX = ARR ADDR ( ARGS )
 ; EXIT:		AX = NUM ARGS
@@ -26,6 +26,16 @@ CmdLineHndl     proc
                                                     cmp byte ptr [si], 13d      ; if( CurrSym == '\r' )
                                                     je __End
                                                     
+                                                    push bx
+                                                    push ax
+                                                    xor ax, ax
+                                                    mov byte ptr al, [si]
+                                                    mov bh, 1d		; X
+                                                    mov bl, 5d		; Y
+                                                    call PrintDec
+                                                    pop ax
+                                                    pop bx
+
                                                     inc cx                      ; i++
                                                     inc si                      ; CurrSymPos++
                                             
@@ -48,7 +58,7 @@ CmdLineHndl     proc
                                     ; put NUM to ARR
                                     push bx                     ; push (6)
                                     add  bx, ax                 ; BX += CurrNumArg
-                                    mov  word ptr [bx], cx      ; arr[AX] = NUM 
+                                    mov  byte ptr [bx], cl      ; arr[AX] = NUM 
                                     pop  bx                     ; pop  (6)
 
                                     inc ax                      ; NumArgs++

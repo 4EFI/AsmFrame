@@ -86,19 +86,46 @@ PrintChar		proc
 ;			BH = X LEFT CORNER COORDS [0; 79]
 ;			BL = Y LEFT CORNER COORDS [0; 24]
 ;			CH = WIDTH
+;			DH = LEFT  SYM
+;			DL = RIGHT SYM
 ; EXIT:		NONE
 ; EXPECTS:	ES = 0b800h (VIDEO SEGMENT)
-; DESTROYS:	DX DI
+; DESTROYS:	DI
 ;------------------------------------------------
 
 PrintHrzLine	proc
 
-				cmp ch, 0		; if( ch <= 0 ) ret
+				cmp ch, 1			; if( ch <= 1 ) ret
 				jbe __End
 
-				push bx 		
+				push bx				; push (1) 
+				push dx				; push (2)
 
-				xor dx, dx		; i = 0
+
+				push ax				; push (3)
+				mov al, dh			; printf( "%c", LeftSym )
+				call PrintChar
+				pop ax				; pop  (3)
+
+				push ax				; push (4)
+				push bx				; push (5)
+				add bh, ch			; X += ( WIDTH - 1 )			
+				sub bh, 1
+				mov al, dl			; printf( "%c", RightSym )
+				call PrintChar
+				pop bx				; pop  (5)
+				pop ax				; pop  (4)
+
+				push bx				; push (6)
+				push cx				; push (7)
+
+				add bh, 1			; X += 1		
+				sub ch, 2			; WIDTH -= 2
+
+				cmp ch, 0			; if( ch == 0 )
+				je 	__EndPrinting	
+
+				xor dx, dx			; i = 0
 
 				__Next:			call PrintChar
 						
@@ -106,8 +133,18 @@ PrintHrzLine	proc
 								inc dh
 
 								cmp dh, ch
-								jne __Next
-				pop bx
+								je  __EndPrinting
+
+								jmp __Next
+
+				__EndPrinting:
+
+				pop cx				; pop  (7)
+				pop bx				; pop  (6)
+				
+
+				pop dx				; pop  (2)
+				pop bx				; pop  (1)			
 
 				__End:
 				ret
@@ -157,79 +194,38 @@ PrintVrtLine	proc
 ; DESTROYS:	AX DX DI
 ;------------------------------------------------
 
-box_clr db		01fh	; yellow on red
+TypeSize = 9
 
-;				lt	  ld	rt	  rd	lv	  rv	th	  dh
-type_1 	db 		0c9h, 0c8h, 0bbh, 0bch, 0bah, 0bah, 0cdh, 0cdh
-type_2	db		0c9h, 0c8h, 0bbh, 0bch, 003h, 003h, 003h, 003h
+;				0		1 		2 		3		4		5		6		7
+;				lt	  	ld		rt	  	rd		lv	 	rv		th	  	dh
+type_1 	db 		0c9h, 	0c8h, 	0bbh, 	0bch, 	0bah, 	0bah,	0cdh,	0cdh
+type_2	db		0c9h, 	0c8h, 	0bbh, 	0bch, 	003h, 	003h, 	003h, 	003h
+
+X_Num   = 0
+Y_Num   = 1
+W_Num   = 2
+H_Num   = 3
+Clr_Num = 4				
 
 PrintBox		proc
 
-				mov ah, box_clr
+				push ax 			; push (1)
+				push cx				; push (2)
 
-				push bx				; print left top char
-				mov al, type_2[0]		
-				call PrintChar
-				pop bx			
+				mov ah, 07 ; bx[Clr_Num]
 
-				push bx				; print left down char
-				add bl, cl			
-				sub bl, 1
-				mov al, type_2[1]
-				call PrintChar
-				pop bx
-							
-				push bx				; print right top char		
-				add bh, ch					
-				sub bh, 1
-				mov al, type_2[2]
-				call PrintChar
-				pop bx
+				mov byte ptr ch, 4 ; bx[W_Num]		; set WIDTH	
+				mov byte ptr cl, bx[H_Num]		; set HEIGHT	
 
-				push bx				; print right down char	
-				add bh, ch						
-				sub bh, 1
-				add bl, cl
-				sub bl, 1
-				mov al, type_2[3]
-				call PrintChar
-				pop bx
+				mov byte ptr al, type_1[6]		; set horizontal sym
+				mov byte ptr dh, type_1[0]		; set left  top  sym
+				mov byte ptr dl, type_1[2]		; set right top  sym
+ 				mov byte ptr bh, bx[X_Num]		; set X
+				mov byte ptr bl, bx[Y_Num]		; set Y
+				call PrintHrzLine				; Print top horizontal line
 
-				push bx				; print left vertical line	
-				add bl, 1					
-				mov al, type_2[4]
-				sub cl, 2
-				call PrintVrtLine
-				add cl, 2
-				pop bx
-				
-				push bx 			; print right vertical line	
-				add bl, 1					
-				add bh, ch
-				sub bh, 1
-				mov al, type_2[5]
-				sub cl, 2
-				call PrintVrtLine
-				add cl, 2
-				pop bx
-
-				push bx				; print top horizontal line	
-				add bh, 1					
-				mov al, type_2[6]
-				sub ch, 2
-				call PrintHrzLine
-				add ch, 2
-				pop bx
-				
-				push bx 			; print down horizontal line	
-				add bh, 1					
-				add bl, cl
-				sub bl, 1
-				mov al, type_2[7]
-				sub ch, 2
-				call PrintHrzLine
-				add ch, 2
-				pop bx
+				pop cx				; pop  (2)
+				pop ax				; pop  (1)
 
 				ret
 				endp
