@@ -142,7 +142,53 @@ PrintChar		proc
 				pop di    		; pop  (1)
 
 				ret
-				endp	
+				endp
+
+;------------------------------------------------
+;	PRINT STR IN (X; Y)
+;	END SYM '\0' or '$'
+;------------------------------------------------
+; ENTRY:	AH = SYM COLOR
+;			BH = X LEFT CORNER COORDS [0; 79]
+;			BL = Y LEFT CORNER COORDS [0; 24]
+;			CX = STR ADDR
+; EXIT:		NONE
+; EXPECTS:	ES = 0b800h (VIDEO SEGMENT)
+; DESTROYS:	NONE
+;------------------------------------------------
+
+PrintStr		proc
+
+				push ax			; push (1) 
+				push bx			; push (2)	
+				push dx			; push (3)
+				push si			; push (4)
+
+				mov si, cx		; SI = StrAddr
+
+				__Next:			mov dl, [si]	; DX = CurrSym
+
+								cmp dl, 0d		; if( DL == 0 )
+								je __End
+								cmp dl, '$'		; if( DL == '$' )
+								je __End
+
+								mov al, [si]	; AL = CurrSym
+								call PrintChar
+
+								inc bh			; X++
+								inc si			; CurrSymPos++
+
+								loop __Next
+				__End:
+
+				pop si			; pop  (4)
+				pop dx			; pop  (3)
+				pop ax			; pop  (2)
+				pop bx			; pop  (1)
+
+				ret
+				endp
 
 ;------------------------------------------------
 ;	PRINT HORIZONTAL LINE IN (X; Y)
@@ -156,7 +202,7 @@ PrintChar		proc
 ;			DL = RIGHT SYM
 ; EXIT:		NONE
 ; EXPECTS:	ES = 0b800h (VIDEO SEGMENT)
-; DESTROYS:	DI
+; DESTROYS:	NONE
 ;------------------------------------------------
 
 PrintHrzLine	proc
@@ -228,7 +274,7 @@ PrintHrzLine	proc
 ;			DL = DOWN SYM
 ; EXIT:		NONE
 ; EXPECTS:	ES = 0b800h (VIDEO SEGMENT)
-; DESTROYS:	DI
+; DESTROYS:	NONE
 ;------------------------------------------------
 
 PrintVrtLine	proc
