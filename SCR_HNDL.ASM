@@ -146,7 +146,7 @@ PrintChar		proc
 
 ;------------------------------------------------
 ;	PRINT STR IN (X; Y)
-;	END SYM '\0' or '$'
+;	END SYM '\0' || '$' || '\r' 
 ;------------------------------------------------
 ; ENTRY:	AH = SYM COLOR
 ;			BH = X LEFT CORNER COORDS [0; 79]
@@ -169,6 +169,8 @@ PrintStr		proc
 				__Next:			mov dl, [si]	; DX = CurrSym
 
 								cmp dl, 0d		; if( DL == 0 )
+								je __End
+								cmp dl, 13d		; if( DL == '\r' )
 								je __End
 								cmp dl, '$'		; if( DL == '$' )
 								je __End
@@ -344,8 +346,6 @@ PrintVrtLine	proc
 ; DESTROYS:	NONE
 ;------------------------------------------------
 
-TypeSize = 9
-
 ; User's type
 Type_0	db		9 dup (0)
 
@@ -372,8 +372,12 @@ PrintBox		proc
 				push di					; push (6)
 				push bp					; push (7)
 
+				push ax					; push (8)
+
 				mov si, bx				; SI = DATA ADDR( BX )
 
+				; SET TYPE BOX
+				
 				xor ax, ax				; BP = Type_0 + Type * 9
 				mov al, bx[Type_Num]
 				mov cx, 9d				
@@ -386,21 +390,29 @@ PrintBox		proc
 				mov ch, bx[W_Num]		; CH = WIDTH	
 				mov cl, bx[H_Num]		; CL = HEIGHT	
 						
- 				mov  bh, si[X_Num]		; BH = X
+ 				; PRINT TOP HORIZONTAL LINE 
+
+				mov  bh, si[X_Num]		; BH = X
 				mov  bl, si[Y_Num]		; BL = Y
 				mov  al, bp[6]			; AL = horizontal sym
 				mov  dh, bp[0]			; DH = left  top  sym
 				mov  dl, bp[2]			; DL = right top  sym
-				call PrintHrzLine		; Print top horizontal line
+				call PrintHrzLine		
+
+				; PRINT LEFT VERTICAL LINE
 
  				mov  bh, si[X_Num]		; BH = X
 				mov  bl, si[Y_Num]		; BL = Y
 				mov  al, bp[4]			; AL = vertical  sym
 				mov  dh, bp[0]			; DH = left top  sym
 				mov  dl, bp[1]			; DL = left down sym
-				call PrintVrtLine		; Print left vertical line
+				call PrintVrtLine		
 
- 				mov  bh, si[X_Num]		; BH = X
+ 				push bx					; push (9)
+
+				; PRINT DOWN HORIZONTAL LINE
+				
+				mov  bh, si[X_Num]		; BH = X
 				mov  dl, si[Y_Num]	    ; Y += ( HEIGHT - 1 )
 				add  dl, cl
 				sub  dl, 1
@@ -408,7 +420,9 @@ PrintBox		proc
 				mov  al, bp[7]			; AL = horizontal sym
 				mov  dh, bp[1]			; DH = left  down sym
 				mov  dl, bp[3]			; DL = right down sym
-				call PrintHrzLine		; Print down horizontal line
+				call PrintHrzLine	
+
+				; PRINT RIGHT VERTICAL LINE
 
 				mov  dl, si[X_Num]	    ; X += ( WIDTH - 1 )
 				add  dl, ch
@@ -418,10 +432,12 @@ PrintBox		proc
 				mov  al, bp[5]			; AL = vertical   sym
 				mov  dh, bp[2]			; DH = right top  sym
 				mov  dl, bp[3]			; DL = right down sym
-				call PrintVrtLine		; Print right vertical line
+				call PrintVrtLine	
 
-				push bx					; push (8)
-				push cx					; push (9)
+				; FILL BOX
+
+				push bx					; push (10)
+				push cx					; push (11)
 				mov  bh, si[X_Num]		; BH = X + 1
 				add  bh, 1
 				mov  bl, si[Y_Num]		; BL = Y + 1
@@ -429,9 +445,36 @@ PrintBox		proc
 				mov  al, bp[8]			; AL = filling sym
 				sub  ch, 2				; WIDTH  -= 2
 				sub  cl, 2				; HEIGHT -= 2
-				call FillScreen			; Fill Box
-				pop cx					; pop  (9)
-				pop bx					; pop  (8)
+				call FillScreen			
+				pop  cx					; pop  (11)
+				pop  bx					; pop  (10)
+
+				pop  bx					; pop  (9) <> pop (X; Y)
+				pop  ax					; pop  (8) <> pop STR ADDR
+
+				; PRINT STR
+
+				mov  cx, ax				; CX = STR ADDR
+				mov  bx, ax				; BX = STR ADDR
+				call StrLen				; AX = len of str
+				neg  ax					; AX = ( WIDTH - LEN ) / 2
+				xor  dx, dx			
+				mov  dl, si[W_Num]	
+				add  ax, dx
+				xor  dx, dx
+				mov  bp, 2d		
+				div  bp			
+				mov  bh, si[X_Num]		; X += AL
+				add  bh, al	
+				xor  ax, ax				; AX = HEIGHT / 2 
+				mov  al, si[H_Num]		
+				xor  dx, dx
+				mov  bp, 2d		
+				div  bp	
+				mov  bl, si[Y_Num]		; Y += AL
+				add  bl, al				
+				mov  ah, si[Clr_Num]	; AH = color
+				call PrintStr		
 
 				pop bp					; pop  (7)
 				pop di					; pop  (6)

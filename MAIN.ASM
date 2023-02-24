@@ -6,7 +6,7 @@ org 100h
 
 locals __
 
-include 	TOOLS.ASM 			; Exit
+include 	TOOLS.ASM 					; Exit
 
 ;------------------------------------------------
 
@@ -28,17 +28,14 @@ Start:		mov bx, 0b800h 				; ES = VideoSeg
 
 			__NotUserType:
 
-			mov ax, ' '	
-			call ClrScreen			
+			push ax
+			mov  ax, ' '	
+			call ClrScreen		
+			pop  ax	
 
+			add ax, 83h
 			mov bx, offset CmdData
 			call PrintBox
-			
-			mov ah, 07h				; Set color
-			mov bh, 1d				; X
-			mov bl, 5d				; Y
-			mov cx, offset Nam
-			call PrintStr
 
 			; mov ax, 123d				; set NUM
 			; mov bh, 1d				; X

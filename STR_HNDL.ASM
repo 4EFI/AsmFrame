@@ -4,7 +4,7 @@
 ;------------------------------------------------
 ; ENTRY:	BX = STR ADDR
 ; EXIT:		AX = LEN
-; EXPECTS:  END SYM = '$' or '\0'
+; EXPECTS:  END SYM '$' || '\0' || '\r'
 ; DESTROYS: AX	
 ;------------------------------------------------
 
@@ -24,6 +24,8 @@ StrLen          proc
 								cmp  ch, '$'	; if( ch == '$' )
 								je __End	
 								cmp  ch, 0d 	; if( ch == '\0' )
+								je __End	
+								cmp  ch, 13d 	; if( ch == '\r' )
 								je __End	
 
 								jmp __Next
