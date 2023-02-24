@@ -125,18 +125,21 @@ GetVideoPos		proc
 ;			BL = Y LEFT CORNER COORDS [0; 24]
 ; EXIT:		NONE
 ; EXPECTS:	ES = 0b800h (VIDEO SEGMENT)
-; DESTROYS:	DI
+; DESTROYS:	NONE
 ;------------------------------------------------
 
 PrintChar		proc	
 
-				push ax			; push (1)
+				push di			; push (1)
+				push ax			; push (2)
 				
 				call GetVideoPos
 
 				mov di, ax		; print( ax )
-				pop ax			; pop  (1)
+				pop ax			; pop  (2)
 				stosw			
+
+				pop di    		; pop  (1)
 
 				ret
 				endp	
@@ -288,7 +291,8 @@ PrintVrtLine	proc
 ;------------------------------------------------
 ;	PRINT BOX
 ;------------------------------------------------
-; ENTRY:	BX = DATA ADDR
+; ENTRY:	AX = STR  ADDR
+;			BX = DATA ADDR
 ; EXIT:		NONE
 ; EXPECTS:	ES = 0b800h (VIDEO SEGMENT)
 ; DESTROYS:	NONE
@@ -303,7 +307,7 @@ Type_0	db		9 dup (0)
 ;				0		1 		2 		3		4		5		6		7		9
 ;				lt	  	ld		rt	  	rd		lv	 	rv		th	  	dh		fill
 Type_1 	db 		0c9h, 	0c8h, 	0bbh, 	0bch, 	0bah, 	0bah,	0cdh,	0cdh, 	0d
-Type_2	db		0c9h, 	0c8h, 	0bbh, 	0bch, 	003h, 	003h, 	003h, 	003h,  	0d
+Type_2	db		003h, 	003h, 	003h, 	003h, 	003h, 	003h, 	003h, 	003h,  	0d
 
 X_Num    = 0
 Y_Num    = 1
@@ -324,13 +328,12 @@ PrintBox		proc
 
 				mov si, bx				; SI = DATA ADDR( BX )
 
-				xor ax, ax				; BP = Type_1 + ( Type - 1 ) * 9
-				mov al, bx[Type_Num]	
-				sub al, 1
+				xor ax, ax				; BP = Type_0 + Type * 9
+				mov al, bx[Type_Num]
 				mov cx, 9d				
 				mul cx 
 				mov bp, ax
-				add bp, offset Type_1
+				add bp, offset Type_0
 
 				mov ah, bx[Clr_Num]		; AH = Color
 

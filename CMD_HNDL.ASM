@@ -1,9 +1,12 @@
 
 ;------------------------------------------------
-;	DIVIDE CMD LINE ARGS ( FROM 82h ) TO ARRAY ( BYTE PTR )
+;	DIVIDE CMD LINE ARGS ( FROM 82h + CL ) 
+;   TO ARRAY ( BYTE PTR )
 ;------------------------------------------------
-; ENTRY:	BX = ARR ADDR ( ARGS )
-; EXIT:		AX = NUM ARGS
+; ENTRY:    BX = ARR ADDR ( ARGS )
+;           CL = CMD LINE OFFSET
+;           CH = AMOUNT OF NUMBERS TO HANDLE
+; EXIT:		AX = NEW CMD LINE OFFSET
 ; DESTROYS:	AX
 ;------------------------------------------------
 
@@ -11,12 +14,20 @@ CmdLineHndl     proc
 
                 xor ax, ax      ; AX = 0 ( num args counter = 0 ) 
 
-                push si         ; push (1)
-                push cx         ; push (2)
+                push cx         ; push (1)
+                push si         ; push (2)
 
-                mov si, 82h     ; CurrSymPos = 82h
+                push cx         ; push (3)
+                xor  ch, ch     ; CH = 0
+                mov  si, 82h    ; CurrSymPos = 82h + offset
+                add  si, cx     
+                pop  cx         ; pop  (3)
 
-                __NextNum:          xor cx, cx      ; i = 0
+                cmp ch, 0       ; if( CH = 0 )
+                je __EndNum 
+
+                __NextNum:          push cx         ; push (4)    
+                                    xor  cx, cx     ; i = 0
 
                                     __Next:         cmp byte ptr [si], ' '      ; if( CurrSym == ' ' )
                                                     je __End
@@ -38,24 +49,29 @@ CmdLineHndl     proc
                                     je __EndArgsCheck
 
                                     ; STR to NUM
-                                    push bx         ; push (3)
-                                    push ax         ; push (4)
+                                    push bx         ; push (5)
+                                    push ax         ; push (6)
                                     mov  bx, si     ; BX = SI - i
                                     sub  bx, cx          
                                     call Atoi
                                     mov  cx, ax     ; CX = AX 
-                                    pop  ax         ; pop  (4) 
-                                    pop  bx         ; pop  (3)
+                                    pop  ax         ; pop  (6) 
+                                    pop  bx         ; pop  (5)
 
                                     ; put NUM to ARR
-                                    push bx                     ; push (5)
+                                    push bx                     ; push (7)
                                     add  bx, ax                 ; BX += CurrNumArg
                                     mov  byte ptr [bx], cl      ; arr[AX] = NUM 
-                                    pop  bx                     ; pop  (5)
+                                    pop  bx                     ; pop  (7)
 
                                     inc ax                      ; NumArgs++
 
                                     __EndArgsCheck:
+
+                                    pop cx                      ; pop (4)
+
+                                    cmp al, ch                  ; if( AL == CH )
+                                    je __EndNum
 
                                     cmp byte ptr [si], 13d      ; if( CurrSym == '\r' )
                                     je __EndNum
@@ -67,8 +83,11 @@ CmdLineHndl     proc
                                     jmp __NextNum
                 __EndNum:
 
-                pop cx          ; pop  (2)
-                pop si          ; pop  (1)
+                mov ax, si      ; AX = SI - 82h
+                sub ax, 82h
+
+                pop si          ; pop  (2)
+                pop cx          ; pop  (1)
 
                 ret
                 endp

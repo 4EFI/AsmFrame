@@ -1,2 +1,2 @@
-#        X      Y       W       H       CLR     TYPE
-MAIN.COM 0      4       45      10      31      1 
+#        X      Y       W       H       CLR     TYPE    STR
+MAIN.COM 0      0       40      15      31      1       Vlados        
