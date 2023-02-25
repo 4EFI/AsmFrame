@@ -38,6 +38,85 @@ StrLen          proc
                 endp
 
 ;------------------------------------------------
+;	GET ADDR OF CHR IN ARR
+;	RET NULL IF NOT FOUND
+;------------------------------------------------
+; ENTRY:	BX = ARR ADDR
+;			CL = CHR
+;			DX = LEN OF THE COMPARED PART (IN BYTES)
+; EXIT:		AX = ADDR OF CHR
+; DESTROYS: AX	
+;------------------------------------------------
+
+MemChr			proc
+
+				push bx			; push (1)
+				push si			; push (2)
+
+				xor ax, ax		; AX = NULL
+				xor si, si		; i  = 0
+
+				cmp dx, 0d		; if( len == 0 )
+				je __End
+
+				__Next:			cmp bx[si], cl		; if( Addr[i] == CHR )
+								je __Found
+
+								inc si
+
+								cmp si, dx
+								je __End
+
+								loop __Next
+
+				__Found:		mov ax, bx			; AX = ArrAddr + i
+								add ax, si
+
+				__End:
+				pop si			; pop  (2)
+				pop bx			; pop  (1)
+
+				ret 
+				endp
+
+;------------------------------------------------
+;	GET ADDR OF CHR IN STR
+;	RET NULL IF NOT FOUND
+;------------------------------------------------
+; ENTRY:	BX = ARR ADDR
+;			CL = CHR
+; EXIT:		AX = ADDR OF CHR
+; DESTROYS: AX	
+;------------------------------------------------
+
+StrChr			proc
+
+				push bx			; push (1)
+				push si			; push (2)
+
+				xor ax, ax		; AX = NULL
+				xor si, si		; i  = 0
+
+				__Next:			cmp byte ptr bx[si], cl		; if( Addr[i] == CHR )
+								je __Found
+								cmp byte ptr bx[si], 0d		; if( Addr[i] == 0 )
+								je __End
+
+								inc si
+
+								loop __Next
+
+				__Found:		mov ax, bx					; AX = ArrAddr + i
+								add ax, si
+
+				__End:
+				pop si			; pop  (2)
+				pop bx			; pop  (1)
+
+				ret 
+				endp
+
+;------------------------------------------------
 ;	TRANSLATE STR TO NUMBER
 ;------------------------------------------------
 ; ENTRY:	BX = STR ADDR

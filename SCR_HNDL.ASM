@@ -146,14 +146,14 @@ PrintChar		proc
 
 ;------------------------------------------------
 ;	PRINT STR IN (X; Y)
-;	END SYM '\0' || '$' || '\r' 
 ;------------------------------------------------
 ; ENTRY:	AH = SYM COLOR
 ;			BH = X LEFT CORNER COORDS [0; 79]
 ;			BL = Y LEFT CORNER COORDS [0; 24]
 ;			CX = STR ADDR
 ; EXIT:		NONE
-; EXPECTS:	ES = 0b800h (VIDEO SEGMENT)
+; EXPECTS:	ES      = 0b800h (VIDEO SEGMENT)
+;			END SYM = '\0' || '$' || '\r' 
 ; DESTROYS:	NONE
 ;------------------------------------------------
 
@@ -372,7 +372,7 @@ PrintBox		proc
 				push di					; push (6)
 				push bp					; push (7)
 
-				push ax					; push (8)
+				push ax					; push (8) <> push STR ADDR
 
 				mov si, bx				; SI = DATA ADDR( BX )
 
@@ -408,7 +408,7 @@ PrintBox		proc
 				mov  dl, bp[1]			; DL = left down sym
 				call PrintVrtLine		
 
- 				push bx					; push (9)
+ 				push bx					; push (9) <> push (X; Y)
 
 				; PRINT DOWN HORIZONTAL LINE
 				
