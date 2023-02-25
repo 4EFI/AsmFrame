@@ -37,6 +37,16 @@ Start:		mov bx, 0b800h 				; ES = VideoSeg
 			mov bx, offset CmdData
 			call PrintBox
 
+			mov  bx, offset New
+			mov  cl, 'A'
+			mov  dx, 5d
+			call MemSet
+
+			mov  ah, 07h
+			xor  bx, bx
+			mov  cx, offset New
+			; call PrintStr
+
 			; mov ax, 123d				; set NUM
 			; mov bh, 1d				; X
 			; mov bl, 5d				; Y
@@ -48,7 +58,8 @@ Start:		mov bx, 0b800h 				; ES = VideoSeg
 
 CmdData	db	20 dup (0)		; Cmd line data
 
-Nam    	db	"Vlad", 0
+Nam    	db	"AAAAA", 0
+New 	db  10 dup (0)
 
 include 	SCR_HNDL.ASM 	; Clear screen function
 include 	CMD_HNDL.ASM 	; CMD line handler

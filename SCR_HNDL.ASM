@@ -354,6 +354,7 @@ Type_0	db		9 dup (0)
 ;				lt	  	ld		rt	  	rd		lv	 	rv		th	  	dh		fill
 Type_1 	db 		0c9h, 	0c8h, 	0bbh, 	0bch, 	0bah, 	0bah,	0cdh,	0cdh, 	0d
 Type_2	db		003h, 	003h, 	003h, 	003h, 	003h, 	003h, 	003h, 	003h,  	0d
+Type_3	db		0bch, 	0bbh, 	0c8h, 	0c9h, 	0cdh, 	0cdh, 	0bah, 	0bah,  	0d
 
 X_Num    = 0
 Y_Num    = 1

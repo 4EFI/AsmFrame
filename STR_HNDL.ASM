@@ -50,8 +50,7 @@ StrLen          proc
 
 MemChr			proc
 
-				push bx			; push (1)
-				push si			; push (2)
+				push si			; push (1)
 
 				xor ax, ax		; AX = NULL
 				xor si, si		; i  = 0
@@ -67,14 +66,13 @@ MemChr			proc
 								cmp si, dx
 								je __End
 
-								loop __Next
+								jmp __Next
 
 				__Found:		mov ax, bx			; AX = ArrAddr + i
 								add ax, si
 
 				__End:
-				pop si			; pop  (2)
-				pop bx			; pop  (1)
+				pop si			; pop  (1)
 
 				ret 
 				endp
@@ -91,8 +89,7 @@ MemChr			proc
 
 StrChr			proc
 
-				push bx			; push (1)
-				push si			; push (2)
+				push si			; push (1)
 
 				xor ax, ax		; AX = NULL
 				xor si, si		; i  = 0
@@ -104,14 +101,228 @@ StrChr			proc
 
 								inc si
 
-								loop __Next
+								jmp __Next
 
-				__Found:		mov ax, bx					; AX = ArrAddr + i
+				__Found:		mov ax, bx					; AX = ArrAddr + i 
 								add ax, si
 
 				__End:
+				pop si			; pop  (1)
+
+				ret 
+				endp
+
+;------------------------------------------------
+;	THE MEMSET FUNCTION FILLS 
+;	THE FIRST N BYTES OF THE MEMORY 
+;	LOCATION POINTED TO BY THE 
+;	DESTINATION ARGUMENT WITH THE 
+;	CHARACTER SPECIFIED BY THE CHR ARGUMENT
+;------------------------------------------------
+; ENTRY:	BX = DESTINATION 
+;			CL = CHR
+;			DX = N
+; EXIT:		NONE
+; DESTROYS: NONE
+;------------------------------------------------
+
+MemSet			proc
+
+				push si			; push (1)
+
+				xor si, si		; i = 0
+
+				cmp dx, 0d		; if( N == 0 )
+				je __End
+
+				__Next:			mov byte ptr bx[si], cl		; BX[i] = CHR
+
+								inc si						; i++
+
+								cmp si, dx					; if( i == N )
+								je __End
+
+								jmp __Next
+				__End:
+				pop	si			; pop  (1)
+
+				ret
+				endp
+
+;------------------------------------------------
+;	THE MEMCPY FUNCTION COPIES N BYTES 
+;	FROM THE ARRAY (SOURCE) TO THE ARRAY 
+;	(DESTINATION). IF THE ARRAYS OVERLAP, 
+;	THE RESULT OF THE COPY WILL BE UNDEFINED
+;------------------------------------------------
+; ENTRY:	BX = DESTINATION
+;			CX = SOURCE
+;			DX = N
+; EXIT:		NONE
+; DESTROYS: NONE
+;------------------------------------------------
+
+MemCpy			proc	
+
+				push si			; push (1)
+				push bp			; push (2)
+
+				mov bp, cx		; BP = CX
+
+				xor si, si		; i = 0
+
+				cmp dx, 0		; if( N == 0 )
+				je __End
+
+				__Next:			push dx						; push (3)
+								mov  dl, bp[si]
+								mov  byte ptr bx[si], dl 	; BX[i] = CX[i]
+								pop  dx						; pop  (3)						
+
+								inc si						; i++
+
+								cmp si, dx					; if( N == i )
+								je __End
+
+								jmp __Next
+
+				__End:
+				pop bp			; pop  (2)
+				pop si			; pop  (1)
+
+				ret 
+				endp
+
+;------------------------------------------------
+; 	THE STRCPY FUNCTION COPIES THE DATA FROM 
+; 	THE SOURCE ARGUMENT TO THE DESTINATION 
+;	UNTIL THE END-OF-LINE( NULL ) CHARACTER 
+;	IS ENCOUNTERED. 
+;	COPYING IS DONE ALONG WITH THE 
+;	END-OF-LINE CHARACTER
+;------------------------------------------------
+; ENTRY:	BX = DESTINATION
+;			CX = SOURCE
+; EXIT:		NONE
+; DESTROYS: NONE
+;------------------------------------------------
+
+StrCpy			proc	
+
+				push dx			; push (1)
+				push si			; push (2)
+				push bp			; push (3)
+
+				mov bp, cx		; BP = CX
+
+				xor si, si		; i = 0
+
+				__Next:			mov dl, bp[si]
+								mov byte ptr bx[si], dl 	; BX[i] = CX[i]
+
+								cmp byte ptr bp[si], 0d		; if( CX[i] == 0 )
+								je __End
+
+								inc si						; i++
+
+								jmp __Next
+
+				__End:
+				pop bp			; pop  (3)
 				pop si			; pop  (2)
-				pop bx			; pop  (1)
+				pop dx			; pop  (1)
+
+				ret 
+				endp
+
+;------------------------------------------------
+; 	THE MEMCMP FUNCTION COMPARES, BYTE BY BYTE, 
+;	THE TWO ARRAYS ARR_1 AND ARR_2. 
+;	THE COMPARISON CONTINUES UNTIL N BYTES 
+;	HAVE BEEN CHECKED OR UNTIL DIFFERENT 
+;	BYTES ARE ENCOUNTERED.
+;------------------------------------------------
+; ENTRY:	BX = ARR_1
+;			CX = ARR_2
+;			DX = N
+; EXIT:		AX = 0 ( ARR_1[i] == ARR_2[i] : FOR i in [0; N-1] )
+;			AX > 0 ( ARR_1[i] >  ARR_2[i] )
+;			AX < 0 ( ARR_1[i] <  ARR_2[i] )
+; DESTROYS: AX
+;------------------------------------------------
+
+MemCmp			proc
+
+				push si			; push (1)
+				push bp			; push (2)
+
+				mov bp, cx		; BP = CX
+
+				xor ax, ax		; AX = 0
+				xor si, si		; i  = 0
+
+				cmp dx, 0d		; if( N == 0 )
+				je __End
+
+				__Next:			mov al, bx[si] 		; AL  = BX[i]
+								sub ax, bp[si]		; AX -= CX[i] 
+
+								cmp ax, 0d			; if( AX != 0 )
+								jne __End
+
+								inc si
+
+								cmp si, dx			; if( i == N )
+								je __End
+
+								jmp __Next	
+				__End:
+				pop bp			; pop  (2) 	
+				pop si			; pop  (1)
+
+				ret 
+				endp
+
+;------------------------------------------------
+; 	THE MEMCMP FUNCTION COMPARES, BYTE BY BYTE, 
+;	THE TWO ARRAYS STR_1 AND STR_2. 
+;	THE COMPARISON CONTINUES UNTIL THE 
+;	END-OF-LINE( NULL ) OR UNTIL DIFFERENT 
+;	BYTES ARE ENCOUNTERED.
+;------------------------------------------------
+; ENTRY:	BX = STR_1
+;			CX = STR_2
+; EXIT:		AX = 0 ( STR_1[i] == STR_2[i] : FOR ALL i )
+;			AX > 0 ( STR_1[i] >  STR_2[i] )
+;			AX < 0 ( STR_1[i] <  STR_2[i] )
+; DESTROYS: AX
+;------------------------------------------------
+
+StrCmp			proc
+
+				push si			; push (1)
+				push bp			; push (2)
+
+				mov bp, cx		; BP = CX
+
+				xor ax, ax		; AX = 0
+				xor si, si		; i  = 0
+
+				__Next:			mov al, bx[si] 				; AL  = BX[i]
+								sub ax, bp[si]				; Al -= CX[i] 
+
+								cmp ax, 0d					; if( AX != 0 )
+								jne __End
+	
+								cmp byte ptr bx[si], 0d		; if( BX[i] == 0 )
+								je __End
+								
+								inc si
+
+								jmp __Next	
+				__End:
+				pop bp			; pop  (2) 	
+				pop si			; pop  (1)
 
 				ret 
 				endp
