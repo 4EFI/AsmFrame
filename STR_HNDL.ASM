@@ -258,14 +258,18 @@ MemCmp			proc
 
 				mov bp, cx		; BP = CX
 
-				xor ax, ax		; AX = 0
 				xor si, si		; i  = 0
 
 				cmp dx, 0d		; if( N == 0 )
 				je __End
 
-				__Next:			mov al, bx[si] 		; AL  = BX[i]
-								sub ax, bp[si]		; AX -= CX[i] 
+				__Next:			xor  ax, ax					; AX  = 0
+								mov  al, bx[si] 			; AL  = BX[i]
+								push dx						; push (3) 
+								xor  dx, dx					; DX = 0
+								mov  dl, bp[si]				
+								sub  ax, dx					; AX -= CX[i] 
+								pop  dx						; pop  (3)
 
 								cmp ax, 0d			; if( AX != 0 )
 								jne __End
@@ -285,7 +289,7 @@ MemCmp			proc
 
 ;------------------------------------------------
 ; 	THE MEMCMP FUNCTION COMPARES, BYTE BY BYTE, 
-;	THE TWO ARRAYS STR_1 AND STR_2. 
+;	THE TWO STRINGS STR_1 AND STR_2. 
 ;	THE COMPARISON CONTINUES UNTIL THE 
 ;	END-OF-LINE( NULL ) OR UNTIL DIFFERENT 
 ;	BYTES ARE ENCOUNTERED.
@@ -305,15 +309,19 @@ StrCmp			proc
 
 				mov bp, cx		; BP = CX
 
-				xor ax, ax		; AX = 0
 				xor si, si		; i  = 0
 
-				__Next:			mov al, bx[si] 				; AL  = BX[i]
-								sub ax, bp[si]				; Al -= CX[i] 
+				__Next:			xor  ax, ax					; AX  = 0
+								mov  al, bx[si] 			; AL  = BX[i]
+								push dx						; push (3) 
+								xor  dx, dx					; DX = 0
+								mov  dl, bp[si]				
+								sub  ax, dx					; AX -= CX[i] 
+								pop  dx						; pop  (3)
 
 								cmp ax, 0d					; if( AX != 0 )
 								jne __End
-	
+
 								cmp byte ptr bx[si], 0d		; if( BX[i] == 0 )
 								je __End
 								

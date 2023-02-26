@@ -47,6 +47,10 @@ Start:		mov bx, 0b800h 				; ES = VideoSeg
 			mov  cx, offset New
 			; call PrintStr
 
+			mov  bx, offset Nam
+			mov  cx, offset New
+			call StrCmp
+
 			; mov ax, 123d				; set NUM
 			; mov bh, 1d				; X
 			; mov bl, 5d				; Y
