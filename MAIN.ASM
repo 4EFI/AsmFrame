@@ -33,14 +33,16 @@ Start:		mov bx, 0b800h 				; ES = VideoSeg
 			call ClrScreen		
 			pop  ax	
 
-			mov ax, 1234d
-			mov bh, 0d
-			mov bl, 15d 
+			push ax
+			mov  ax, 1234d
+			mov  bh, 41d
+			mov  bl, 15d 
 			call PrintNum
+			pop  ax
 
-			; add ax, 83h
-			; mov bx, offset CmdData
-			; call PrintBox
+			add ax, 83h
+			mov bx, offset CmdData
+			call PrintBox
 
 			EXIT	
 
