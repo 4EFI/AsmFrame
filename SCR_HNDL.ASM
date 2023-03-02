@@ -353,8 +353,9 @@ Type_0	db		9 dup (0)
 ;				0		1 		2 		3		4		5		6		7		9
 ;				lt	  	ld		rt	  	rd		lv	 	rv		th	  	dh		fill
 Type_1 	db 		0c9h, 	0c8h, 	0bbh, 	0bch, 	0bah, 	0bah,	0cdh,	0cdh, 	0d
-Type_2	db		003h, 	003h, 	003h, 	003h, 	003h, 	003h, 	003h, 	003h,  	0d
+Type_2	db		003h, 	003h, 	003h, 	003h, 	003h, 	003h, 	003h, 	003h,  	'-'
 Type_3	db		0bch, 	0bbh, 	0c8h, 	0c9h, 	0cdh, 	0cdh, 	0bah, 	0bah,  	0d
+Type_4	db		0dah, 	0c0h, 	0bfh, 	0d9h, 	0b3h, 	0b3h, 	0c4h, 	0c4h,  	0d
 
 X_Num    = 0
 Y_Num    = 1
@@ -486,6 +487,85 @@ PrintBox		proc
 				pop ax					; pop  (1)
 
 				ret
+				endp
+
+;------------------------------------------------
+;	ANIMATE BOX
+;------------------------------------------------
+; ENTRY:	AX = STR  ADDR
+;			BX = DATA ADDR
+; EXIT:		NONE
+; EXPECTS:	ES = 0b800h (VIDEO SEGMENT)
+; DESTROYS:	NONE
+;------------------------------------------------
+
+EmptyStr db		0
+BoxData  db 	20 dup (0)
+
+AnimBox			proc
+
+				push bx			; push (1)
+				push cx			; push (2)
+				push dx			; push (3)
+
+				mov  cx, bx				
+				mov  bx, offset BoxData
+				mov  dx, 20d
+				call memcpy
+
+				xor  cx, cx		; i = 0
+
+				mov  dh, BoxData[W_Num]
+				mov  dl, BoxData[H_Num]
+
+				mov  BoxData[W_Num], 3d
+				mov  BoxData[H_Num], 3d
+
+				push ax			; push (4)
+				mov  ax, offset EmptyStr	
+ 
+				__Next:			call PrintBox	
+
+								cmp byte ptr BoxData[W_Num], dh			; if( CURR_WIDTH == WIDTH )
+								je __NoIncW
+								inc BoxData[W_Num]	
+								
+								__NoIncW:		
+
+								cmp byte ptr BoxData[H_Num], dl			; if( CURR_HEIGHT == HEIGHT )
+								je __NoIncH
+								inc BoxData[H_Num]	
+
+								__NoIncH: 
+
+								inc cx				; i++
+
+								cmp cx, 17d
+								je __End
+
+								push ax				; push (5)
+								push cx				; push (6)
+								mov  ah, 86h
+								mov  cx, 1d
+								int  15h
+								pop  cx				; pop  (6)
+								pop  ax				; pop  (5)
+
+								jmp __Next
+
+				__End:
+				pop ax			; pop  (4)
+
+				mov BoxData[W_Num], dh
+				mov BoxData[H_Num], dl
+
+				call PrintBox
+
+				pop dx			; pop  (3)
+				pop cx			; pop  (2)
+				pop bx			; pop  (1)
+
+				ret 
 				endp
 
 ;------------------------------------------------

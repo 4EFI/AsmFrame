@@ -33,37 +33,20 @@ Start:		mov bx, 0b800h 				; ES = VideoSeg
 			call ClrScreen		
 			pop  ax	
 
-			add ax, 83h
-			mov bx, offset CmdData
-			call PrintBox
+			mov ax, 1234d
+			mov bh, 0d
+			mov bl, 15d 
+			call PrintNum
 
-			mov  bx, offset New
-			mov  cl, 'A'
-			mov  dx, 5d
-			call MemSet
-
-			mov  ah, 07h
-			xor  bx, bx
-			mov  cx, offset New
-			; call PrintStr
-
-			mov  bx, offset Nam
-			mov  cx, offset New
-			call StrCmp
-
-			; mov ax, 123d				; set NUM
-			; mov bh, 1d				; X
-			; mov bl, 5d				; Y
-			; call PrintNum
+			; add ax, 83h
+			; mov bx, offset CmdData
+			; call PrintBox
 
 			EXIT	
 
 ;------------------------------------------------
 
 CmdData	db	20 dup (0)		; Cmd line data
-
-Nam    	db	"AAAAA", 0
-New 	db  10 dup (0)
 
 include 	SCR_HNDL.ASM 	; Clear screen function
 include 	CMD_HNDL.ASM 	; CMD line handler

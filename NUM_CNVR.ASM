@@ -7,12 +7,15 @@
 ;			BL = Y LEFT CORNER COORDS [0; 24]
 ; EXIT:		NONE
 ; EXPECTS:	ES = 0b800h (VIDEO SEGMENT)
-; DESTROYS:	DX DI  
+; DESTROYS:	NONE 
 ;------------------------------------------------
 
 bin_len	= 16d							; len of bin str	
 
 PrintBin		proc				
+				
+				push di					; push (0)
+				
 				push ax					; push (1)
 
 				call GetVideoPos 		; AX = Video position from (X; Y)
@@ -22,13 +25,13 @@ PrintBin		proc
 
 				pop  ax					; pop  (1)
 
-				xor dx, dx				; i = 0
+				push ax dx				; push (2) (3)		
 
-				push ax					; push (2)
+				xor  dx, dx				; i = 0
 
 				__Next:			shr ax, 1				; AX /= 2
 
-								push ax					; push (3)
+								push ax					; push (4)
 
 								jc __One
 
@@ -43,14 +46,15 @@ PrintBin		proc
 								stosw 					
 								add di, 2				
 
-								pop ax					; pop (3)
+								pop ax					; pop (4)
 
 								inc dx
 
 								cmp dx, bin_len			; if( dx == bin_len )
 								jne __Next
 
-				pop ax					; pop  (2)
+				pop dx ax			; pop  (3) (2)
+				pop di				; pop  (0)
 
 				ret
 				endp
@@ -63,12 +67,14 @@ PrintBin		proc
 ;			BL = Y LEFT CORNER COORDS [0; 24]
 ; EXIT:		NONE
 ; EXPECTS:	ES = 0b800h (VIDEO SEGMENT)
-; DESTROYS:	CX DX DI  
+; DESTROYS:	NONE  
 ;------------------------------------------------
 
 hex_len	= 16d							; len of hex str	
 
 PrintHex		proc
+				
+				push di					; push (0)
 				
 				push ax					; push (1)
 
@@ -79,24 +85,24 @@ PrintHex		proc
 
 				pop  ax					; pop  (1)
 
-				xor dx, dx				; i = 0
+				push ax cx dx 			; push (2) (3) (4)
 
-				push ax					; push (2)
+				xor dx, dx				; i = 0
 
 				__Next:			mov cx, 0			; shifts counter			
 	
-								push dx				; push (4)
+								push dx				; push (5)
 								mov  dx, 0			; DX = 0
 								
 								__Shift:		shr ax, 1		; AX /= 2
 		
 												jnc __End
 
-												__One:			push ax			; push (3)
+												__One:			push ax			; push (6)
 																mov  ax, 1 		; AX = 0001b
 																shl  ax, cl		; DX += 2^CX
 																add  dx, ax 
-																pop	 ax			; pop  (3)
+																pop	 ax			; pop  (6)
 								
 								__End:			inc cx			; shifts counter ++
 												cmp cx, 4d		; if( numShifts == 4 )
@@ -115,7 +121,7 @@ PrintHex		proc
 												add dx, 65d
 												mov al, dl
 
-				__Print:		pop dx				; pop  (4)
+				__Print:		pop dx				; pop  (5)
 
 								mov ah, 70h			; black on white
 
@@ -130,7 +136,8 @@ PrintHex		proc
 								cmp dx, hex_len		; if( dx == hex_len )
 								jne __Next
 
-				pop ax					; pop  (2)
+				pop dx cx ax			; pop  (4) (3) (2)
+				pop di					; pop  (0)
 
 				ret
 				endp
@@ -143,13 +150,15 @@ PrintHex		proc
 ;			BL = Y LEFT CORNER COORDS [0; 24]
 ; EXIT:		NONE
 ; EXPECTS:	ES = 0b800h (VIDEO SEGMENT)
-; DESTROYS:	DI
+; DESTROYS:	NONE
 ;------------------------------------------------
 
 dec_len	= 5d	
 
 PrintDec		proc
 
+				push di					; pop  (0)
+				
 				push ax					; push (1)
 
 				call GetVideoPos 		; AX = Video position from (X; Y)
@@ -159,13 +168,9 @@ PrintDec		proc
 
 				pop  ax					; pop  (1)
 
-				push cx					; push (2)
-				push dx					; push (3)
+				push ax cx dx			; push (2) (3) (4)
 
 				xor dx, dx				; i = 0
-
-				push ax					; push (4)
-
 				mov cx, 10d				; CX = 10
 
 				__Next:			push dx				; push (5)
@@ -193,10 +198,8 @@ PrintDec		proc
 								cmp dx, dec_len		; if( DX == dec_len )
 								jne __Next
 				
-				pop ax					; pop  (4)
-
-				pop dx					; pop  (3)
-				pop cx					; pop  (2)
+				pop dx cx ax			; pop  (4) (3) (2)
+				pop di					; pop  (0)
 
 				ret 
 				endp
@@ -209,7 +212,7 @@ PrintDec		proc
 ;			BL = Y LEFT CORNER COORDS [0; 24]
 ; EXIT:		NONE
 ; EXPECTS:	ES = 0b800h (VIDEO SEGMENT)
-; DESTROYS:	CX DX DI  
+; DESTROYS:	NONE  
 ;------------------------------------------------
 
 PrintNum		proc
