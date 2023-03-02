@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 4.1	    03/02/23 23:46:46	    Page 1
+Turbo Assembler	 Version 4.1	    03/02/23 23:53:04	    Page 1
 main.asm
 
 
@@ -60,7 +60,7 @@ main.asm
      55	012D  B3 0F					     mov bl, 15d
      56	012F  E8 0539					     call PrintNum
      57
-Turbo Assembler	 Version 4.1	    03/02/23 23:46:46	    Page 2
+Turbo Assembler	 Version 4.1	    03/02/23 23:53:04	    Page 2
 main.asm
 
 
@@ -122,7 +122,7 @@ main.asm
 1   112
 1   113	0160  FE CE														    +
     114				     dec dh		     ; i--
-Turbo Assembler	 Version 4.1	    03/02/23 23:46:46	    Page 3
+Turbo Assembler	 Version 4.1	    03/02/23 23:53:04	    Page 3
 main.asm
 
 
@@ -184,7 +184,7 @@ main.asm
 1   169	0187  5B						     pop bx			     ; pop  (1)
 1   170
 1   171	0188  C3						     ret
-Turbo Assembler	 Version 4.1	    03/02/23 23:46:46	    Page 4
+Turbo Assembler	 Version 4.1	    03/02/23 23:53:04	    Page 4
 main.asm
 
 
@@ -246,7 +246,7 @@ main.asm
 1   226	01A4  5F						     pop di		     ; pop  (1)
 1   227
 1   228	01A5  C3						     ret
-Turbo Assembler	 Version 4.1	    03/02/23 23:46:46	    Page 5
+Turbo Assembler	 Version 4.1	    03/02/23 23:53:04	    Page 5
 main.asm
 
 
@@ -308,7 +308,7 @@ main.asm
 1   283				     ;------------------------------------------------
 1   284				     ;	     PRINT HORIZONTAL LINE IN (X; Y)
 1   285				     ;------------------------------------------------
-Turbo Assembler	 Version 4.1	    03/02/23 23:46:46	    Page 6
+Turbo Assembler	 Version 4.1	    03/02/23 23:53:04	    Page 6
 main.asm
 
 
@@ -370,7 +370,7 @@ main.asm
 1   340	0202  EB F3										     jmp __Next
 1   341
 1   342	0204							     __EndPrinting:
-Turbo Assembler	 Version 4.1	    03/02/23 23:46:46	    Page 7
+Turbo Assembler	 Version 4.1	    03/02/23 23:53:04	    Page 7
 main.asm
 
 
@@ -432,7 +432,7 @@ main.asm
 1   397	022A  80 E9 02						     sub cl, 2			     ; HEIGHT -= 2
 1   398
 1   399	022D  80 F9 00						     cmp cl, 0			     ; if( cl == 0 )
-Turbo Assembler	 Version 4.1	    03/02/23 23:46:46	    Page 8
+Turbo Assembler	 Version 4.1	    03/02/23 23:53:04	    Page 8
 main.asm
 
 
@@ -494,7 +494,7 @@ main.asm
 1   454	      =0000		     X_Num    =	0
 1   455	      =0001		     Y_Num    =	1
 1   456	      =0002		     W_Num    =	2
-Turbo Assembler	 Version 4.1	    03/02/23 23:46:46	    Page 9
+Turbo Assembler	 Version 4.1	    03/02/23 23:53:04	    Page 9
 main.asm
 
 
@@ -556,7 +556,7 @@ main.asm
 1   511								     ; PRINT DOWN HORIZONTAL LINE
 1   512
 1   513	02B9  8A 3C						     mov  bh, si[X_Num]		     ; BH = X
-Turbo Assembler	 Version 4.1	    03/02/23 23:46:46	    Page 10
+Turbo Assembler	 Version 4.1	    03/02/23 23:53:04	    Page 10
 main.asm
 
 
@@ -618,7 +618,7 @@ main.asm
 1   568	031F  02 F8						     add  bh, al
 1   569	0321  33 C0						     xor  ax, ax			     ; AX = HEIGHT / 2
 1   570	0323  8A 44 03						     mov  al, si[H_Num]
-Turbo Assembler	 Version 4.1	    03/02/23 23:46:46	    Page 11
+Turbo Assembler	 Version 4.1	    03/02/23 23:53:04	    Page 11
 main.asm
 
 
@@ -680,7 +680,7 @@ main.asm
 1   625	037B  E8 FEF5						     __Next:		     call PrintBox
 1   626
 1   627	037E  38 36 0343r									     cmp byte ptr BoxData[W_Num], dh+
-Turbo Assembler	 Version 4.1	    03/02/23 23:46:46	    Page 12
+Turbo Assembler	 Version 4.1	    03/02/23 23:53:04	    Page 12
 main.asm
 
 
@@ -742,7 +742,7 @@ main.asm
 1   682				     ;------------------------------------------------
 1   683
 1   684	      =0064		     InputLen =	100
-Turbo Assembler	 Version 4.1	    03/02/23 23:46:46	    Page 13
+Turbo Assembler	 Version 4.1	    03/02/23 23:53:04	    Page 13
 main.asm
 
 
@@ -804,7 +804,7 @@ main.asm
 1   739				     ;		 CH = AMOUNT OF	NUMBERS	TO HANDLE
 1   740				     ; EXIT:	     AX	= NEW CMD LINE OFFSET
 1   741				     ; DESTROYS:     AX
-Turbo Assembler	 Version 4.1	    03/02/23 23:46:46	    Page 14
+Turbo Assembler	 Version 4.1	    03/02/23 23:53:04	    Page 14
 main.asm
 
 
@@ -866,7 +866,7 @@ main.asm
 1   796									 ; put NUM to ARR
 1   797	0478  53							 push bx		     ; push (7)
 1   798	0479  03 D8							 add  bx, ax		     ; BX += CurrNumArg
-Turbo Assembler	 Version 4.1	    03/02/23 23:46:46	    Page 15
+Turbo Assembler	 Version 4.1	    03/02/23 23:53:04	    Page 15
 main.asm
 
 
@@ -928,7 +928,7 @@ main.asm
 1   853	04A2  8B 0C										     mov  cx, [si]   ; CX = current +
     854				     symbol
 1   855
-Turbo Assembler	 Version 4.1	    03/02/23 23:46:46	    Page 16
+Turbo Assembler	 Version 4.1	    03/02/23 23:53:04	    Page 16
 main.asm
 
 
@@ -990,7 +990,7 @@ main.asm
 1   910
 1   911	04D1							     __End:
 1   912	04D1  5E						     pop si		     ; pop  (1)
-Turbo Assembler	 Version 4.1	    03/02/23 23:46:46	    Page 17
+Turbo Assembler	 Version 4.1	    03/02/23 23:53:04	    Page 17
 main.asm
 
 
@@ -1052,7 +1052,7 @@ main.asm
 1   967				     ;------------------------------------------------
 1   968
 1   969	04EA			     MemSet		     proc
-Turbo Assembler	 Version 4.1	    03/02/23 23:46:46	    Page 18
+Turbo Assembler	 Version 4.1	    03/02/23 23:53:04	    Page 18
 main.asm
 
 
@@ -1114,7 +1114,7 @@ main.asm
    1024				     ; BX[i] = CX[i]
 1  1025	050D  5A										     pop  dx			    +
    1026				     ; pop  (3)
-Turbo Assembler	 Version 4.1	    03/02/23 23:46:46	    Page 19
+Turbo Assembler	 Version 4.1	    03/02/23 23:53:04	    Page 19
 main.asm
 
 
@@ -1176,7 +1176,7 @@ main.asm
 1  1081	052B							     __End:
 1  1082	052B  5D						     pop bp		     ; pop  (3)
 1  1083	052C  5E						     pop si		     ; pop  (2)
-Turbo Assembler	 Version 4.1	    03/02/23 23:46:46	    Page 20
+Turbo Assembler	 Version 4.1	    03/02/23 23:53:04	    Page 20
 main.asm
 
 
@@ -1238,7 +1238,7 @@ main.asm
    1138				     ; if( i ==	N )
 1  1139	054E  74 02										     je	__End
 1  1140
-Turbo Assembler	 Version 4.1	    03/02/23 23:46:46	    Page 21
+Turbo Assembler	 Version 4.1	    03/02/23 23:53:04	    Page 21
 main.asm
 
 
@@ -1300,7 +1300,7 @@ main.asm
 1  1195	0571  46										     inc si
 1  1196
 1  1197	0572  EB E7										     jmp __Next
-Turbo Assembler	 Version 4.1	    03/02/23 23:46:46	    Page 22
+Turbo Assembler	 Version 4.1	    03/02/23 23:53:04	    Page 22
 main.asm
 
 
@@ -1362,7 +1362,7 @@ main.asm
 1  1252	059C  75 F8														    +
    1253				     jne __Mul
 1  1254
-Turbo Assembler	 Version 4.1	    03/02/23 23:46:46	    Page 23
+Turbo Assembler	 Version 4.1	    03/02/23 23:53:04	    Page 23
 main.asm
 
 
@@ -1391,7 +1391,7 @@ main.asm
 1  1276	05AD							     endp
 1  1277
 1  1278				     ;------------------------------------------------
-   1279				     include	     NUM_CNVR.ASM    ; Print AX	in BIN/DEC/HEX
+   1279				     include	     REG_PRNT.ASM    ; Print AX	in BIN/DEC/HEX
 1  1280
 1  1281				     ;------------------------------------------------
 1  1282				     ;	     PRINT AX IN BIN
@@ -1424,7 +1424,7 @@ main.asm
 1  1309
 1  1310	05BB  33 D2						     xor  dx, dx			     ; i = 0
 1  1311
-Turbo Assembler	 Version 4.1	    03/02/23 23:46:46	    Page 24
+Turbo Assembler	 Version 4.1	    03/02/23 23:53:04	    Page 24
 main.asm
 
 
@@ -1486,7 +1486,7 @@ main.asm
 1  1366	05DD  57						     push di				     ; push (0)
 1  1367
 1  1368	05DE  50						     push ax				     ; push (1)
-Turbo Assembler	 Version 4.1	    03/02/23 23:46:46	    Page 25
+Turbo Assembler	 Version 4.1	    03/02/23 23:53:04	    Page 25
 main.asm
 
 
@@ -1548,7 +1548,7 @@ main.asm
 1  1423	0612  8A C2														    +
    1424				     mov al, dl
 1  1425	0614  EB 09 90														    +
-Turbo Assembler	 Version 4.1	    03/02/23 23:46:46	    Page 26
+Turbo Assembler	 Version 4.1	    03/02/23 23:53:04	    Page 26
 main.asm
 
 
@@ -1610,7 +1610,7 @@ main.asm
 1  1480
 1  1481	0638  E8 FB4E						     call GetVideoPos		     ; AX = Video position from	(X; +
    1482				     Y)
-Turbo Assembler	 Version 4.1	    03/02/23 23:46:46	    Page 27
+Turbo Assembler	 Version 4.1	    03/02/23 23:53:04	    Page 27
 main.asm
 
 
@@ -1672,7 +1672,7 @@ main.asm
 1  1537				     ;------------------------------------------------
 1  1538				     ; ENTRY:	     AX	= NUM
 1  1539				     ;			     BH	= X LEFT CORNER	COORDS [0; 79]
-Turbo Assembler	 Version 4.1	    03/02/23 23:46:46	    Page 28
+Turbo Assembler	 Version 4.1	    03/02/23 23:53:04	    Page 28
 main.asm
 
 
@@ -1703,7 +1703,7 @@ main.asm
 1  1563				     ;------------------------------------------------
    1564
    1565				     end		     Start
-Turbo Assembler	 Version 4.1	    03/02/23 23:46:46	    Page 29
+Turbo Assembler	 Version 4.1	    03/02/23 23:53:04	    Page 29
 Symbol Table
 
 
@@ -1713,7 +1713,7 @@ Symbol Name			  Type	 Value
 
 ??DATE				  Text	 "03/02/23"
 ??FILENAME			  Text	 "main	  "
-??TIME				  Text	 "23:46:46"
+??TIME				  Text	 "23:53:04"
 ??VERSION			  Number 040A
 @32BIT				  Text	 0
 @CODE				  Text	 DGROUP
@@ -1765,7 +1765,7 @@ STRLEN				  Near	 DGROUP:0499
 TYPE_0				  Byte	 DGROUP:0246
 TYPE_1				  Byte	 DGROUP:024F
 TYPE_2				  Byte	 DGROUP:0258
-Turbo Assembler	 Version 4.1	    03/02/23 23:46:46	    Page 30
+Turbo Assembler	 Version 4.1	    03/02/23 23:53:04	    Page 30
 Symbol Table
 
 
@@ -1827,7 +1827,7 @@ __NOINCH			  Near	 DGROUP:0392
 __NOINCW			  Near	 DGROUP:0388
 __NOMUL				  Near	 DGROUP:059E
 __NOTUSERTYPE			  Near	 DGROUP:0120
-Turbo Assembler	 Version 4.1	    03/02/23 23:46:46	    Page 31
+Turbo Assembler	 Version 4.1	    03/02/23 23:53:04	    Page 31
 Symbol Table
 
 
