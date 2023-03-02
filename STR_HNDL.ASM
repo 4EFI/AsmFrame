@@ -4,7 +4,7 @@
 ;------------------------------------------------
 ; ENTRY:	BX = STR ADDR
 ; EXIT:		AX = LEN
-; EXPECTS:  END SYM '$' || '\0' || '\r'
+; EXPECTS:  END SYM = '\0'
 ; DESTROYS: AX	
 ;------------------------------------------------
 
@@ -12,8 +12,7 @@ StrLen          proc
 
                 xor ax, ax     	; i = 0
 
-				push cx			; push (1)
-				push si			; push (2)
+				push cx si		; push (1) (2)
 
                 __Next:			mov  si, bx     ; SI = BX + i	    
 							    add  si, ax
@@ -21,18 +20,13 @@ StrLen          proc
 								inc  ax			; i++	
 								mov  cx, [si]	; CX = current symbol
 
-								cmp  ch, '$'	; if( ch == '$' )
-								je __End	
 								cmp  ch, 0d 	; if( ch == '\0' )
 								je __End	
-								cmp  ch, 13d 	; if( ch == '\r' )
-								je __End	
-
+	
 								jmp __Next
 
 				__End:
-				pop si			; pop  (2)
-				pop cx			; pop  (1)		
+				pop si cx		; pop  (2) (1)		
 
                 ret 
                 endp
@@ -84,6 +78,7 @@ MemChr			proc
 ; ENTRY:	BX = ARR ADDR
 ;			CL = CHR
 ; EXIT:		AX = ADDR OF CHR
+; EXPECTS:  END SYM = '\0'
 ; DESTROYS: AX	
 ;------------------------------------------------
 
@@ -96,7 +91,7 @@ StrChr			proc
 
 				__Next:			cmp byte ptr bx[si], cl		; if( Addr[i] == CHR )
 								je __Found
-								cmp byte ptr bx[si], 0d		; if( Addr[i] == 0 )
+								cmp byte ptr bx[si], 0d		; if( Addr[i] == '\0' )
 								je __End
 
 								inc si
@@ -164,8 +159,7 @@ MemSet			proc
 
 MemCpy			proc	
 
-				push si			; push (1)
-				push bp			; push (2)
+				push si bp		; push (1) (2)
 
 				mov bp, cx		; BP = CX
 
@@ -187,8 +181,7 @@ MemCpy			proc
 								jmp __Next
 
 				__End:
-				pop bp			; pop  (2)
-				pop si			; pop  (1)
+				pop bp si		; pop  (2) (1)
 
 				ret 
 				endp
@@ -209,9 +202,7 @@ MemCpy			proc
 
 StrCpy			proc	
 
-				push dx			; push (1)
-				push si			; push (2)
-				push bp			; push (3)
+				push dx	si bp	; push (1) (2) (3)
 
 				mov bp, cx		; BP = CX
 
@@ -228,9 +219,7 @@ StrCpy			proc
 								jmp __Next
 
 				__End:
-				pop bp			; pop  (3)
-				pop si			; pop  (2)
-				pop dx			; pop  (1)
+				pop bp si dx	; pop  (3) (2) (1)
 
 				ret 
 				endp
@@ -253,8 +242,7 @@ StrCpy			proc
 
 MemCmp			proc
 
-				push si			; push (1)
-				push bp			; push (2)
+				push si bp		; push (1) (2)
 
 				mov bp, cx		; BP = CX
 
@@ -281,8 +269,7 @@ MemCmp			proc
 
 								jmp __Next	
 				__End:
-				pop bp			; pop  (2) 	
-				pop si			; pop  (1)
+				pop bp si 		; pop  (2) (1)
 
 				ret 
 				endp
@@ -304,8 +291,7 @@ MemCmp			proc
 
 StrCmp			proc
 
-				push si			; push (1)
-				push bp			; push (2)
+				push si bp		; push (1) (2)
 
 				mov bp, cx		; BP = CX
 
@@ -329,8 +315,7 @@ StrCmp			proc
 
 								jmp __Next	
 				__End:
-				pop bp			; pop  (2) 	
-				pop si			; pop  (1)
+				pop bp si 		; pop  (2) (1)
 
 				ret 
 				endp
@@ -348,8 +333,7 @@ Atoi			proc
 
 				xor ax, ax		; AX = 0
 
-				push dx			; push (1)
-				push si			; push (2)
+				push dx	si		; push (1) (2)
 
 				xor dx, dx		; i = 0
 
@@ -389,8 +373,7 @@ Atoi			proc
 								cmp dx, cx		; if( i == CX )
 								jne __Next	
 
-				pop si			; pop  (2)
-				pop dx			; pop  (1)	
+				pop si dx		; pop  (2) (1)	
 
 				ret	
 				endp

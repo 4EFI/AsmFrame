@@ -13,7 +13,7 @@ include 	TOOLS.ASM 					; Exit
 Start:		mov bx, 0b800h 				; ES = VideoSeg
 			mov es, bx
 
-			mov cl, 0					; Cmd line box handler
+			mov cl, 0					; CMD line box handler
 			mov ch, 6
 			mov bx, offset CmdData
 			call CmdLineHndl
@@ -28,6 +28,15 @@ Start:		mov bx, 0b800h 				; ES = VideoSeg
 
 			__NotUserType:
 
+			mov bx, offset CmdStr		; Copy str from CMD line
+			add ax, 83h
+			mov cx, ax
+			call StrCpy
+			call StrLen					; CmdStr[ strlen( CmdStr ) - 1 ] = '\0'		// remove last '\r'
+			mov  si, ax
+			dec  si
+			mov  byte ptr bx[si], 0d	
+
 			push ax
 			mov  ax, ' '	
 			call ClrScreen		
@@ -39,8 +48,8 @@ Start:		mov bx, 0b800h 				; ES = VideoSeg
 			mov  bl, 15d 
 			call PrintNum
 			pop  ax
-
-			add ax, 83h
+			
+			mov ax, offset CmdStr
 			mov bx, offset CmdData
 			call PrintBox
 
@@ -49,6 +58,7 @@ Start:		mov bx, 0b800h 				; ES = VideoSeg
 ;------------------------------------------------
 
 CmdData	db	20 dup (0)		; Cmd line data
+CmdStr  db	20 dup (0)		; Cmd line str
 
 include 	SCR_HNDL.ASM 	; Clear screen function
 include 	CMD_HNDL.ASM 	; CMD line handler
